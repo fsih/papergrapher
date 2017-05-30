@@ -1,0 +1,7 @@
+#colorSwitchButton, #strokeColorInput, #strokeColorSpec {
+	display: none;
+}
+
+#opacitySection, #strokeSection, #blendModeSection {
+	display: none;
+}
