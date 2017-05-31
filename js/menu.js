@@ -9,6 +9,9 @@ pg.menu = function() {
 
 
 	var setupNavigationLogic = function() {
+		if (mode === "SIMPLE") {
+			return;
+		}
 		
 		// click on $topMenuButton sets active state on button and shows/hides 
 		// submenu. also shows/hides inputblocker in the background (transparent)

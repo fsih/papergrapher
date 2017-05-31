@@ -179,6 +179,9 @@ pg.stylebar = function() {
 
 
 	var getStrokeColor = function() {
+		if (mode === "SIMPLE") {
+			return null;
+		}
 		var value = jQuery("#strokeColorInput").spectrum("get");
 		return value ? value.toRgbString() : null;
 	};
@@ -554,6 +557,11 @@ pg.stylebar = function() {
 		
 		if(getStrokeWidth() === null) {
 			setStrokeWidth(1);
+		}
+
+		if (mode === "SIMPLE") {
+			pg.stylebar.setStrokeColor('rgba(0,0,0,0)');
+			pg.stylebar.setStrokeWidth(0);
 		}
 
 	};
