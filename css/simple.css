@@ -1,3 +1,21 @@
-.colorSwitchButton, .strokeColorInput, .strokeColorSpec {
+.colorSwitchButton, .strokeColorInput, .strokeColorSpec, #opacitySection, #strokeSection, #blendModeSection {
 	display: none;
+}
+
+body {
+	background: aliceblue
+}
+
+#paperCanvas {
+	width: 1000px;
+	height: 800px;
+	top: 30px;
+	left: 76px;
+    border: 1px solid aliceblue;
+    border-radius: 2px;
+	background-color: #fff
+}
+
+.toolbar {
+	height:800px;
 }

@@ -14,10 +14,9 @@
 	<link href="css/toolbar.css" rel="stylesheet" />
 	<link href="css/toolOptionPanel.css" rel="stylesheet" />
 	<link href="css/simple.css" rel="stylesheet" />
-	
 </head>
 <body>
-	<canvas id="paperCanvas" data-paper-resize="true" data-paper-hidpi="off"></canvas>
+	<canvas id="paperCanvas" data-paper-resize="false" data-paper-hidpi="off"></canvas>
 	
 	<div id="loadingScreen" class="loadingScreen">
 		<div class="panel">Loading...</div>
@@ -26,7 +25,11 @@
 	<!-- Main Menu -->
 	<nav class="appNav" id="appNav">
 		<ul class="topMenu">
-			<li class="topMenuButton"><svg class="burgerButton" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"><line stroke-width="12" x1="0" y1="9.5" x2="100" y2="9.5"/><line stroke-width="12" x1="0" y1="50.5" x2="100" y2="50.5"/><line stroke-width="12" x1="0" y1="90.5" x2="100" y2="90.5"/></svg>
+
+			<li class="undo_button">Undo</li>
+			<li class="redo_button">Redo</li>
+			
+			<li class="topMenuButton hidden"><svg class="burgerButton" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"><line stroke-width="12" x1="0" y1="9.5" x2="100" y2="9.5"/><line stroke-width="12" x1="0" y1="50.5" x2="100" y2="50.5"/><line stroke-width="12" x1="0" y1="90.5" x2="100" y2="90.5"/></svg>
 				<ul class="subMenu">
 					<li class="clearDocument_button">New</li>
 					<li class="importJSON_button">Open<input id="fileUploadJSON" class="fileUploadInput" type="file" accept=".json" ></li>
@@ -68,7 +71,7 @@
 				</ul>
 			</li>
 			
-			<li class="topMenuButton">Tool
+			<li class="topMenuButton hidden">Tool
 				<ul class="subMenu" id="toolSubMenu">
 				</ul>
 			</li>
