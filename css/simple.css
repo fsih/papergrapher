@@ -19,3 +19,7 @@ body {
 .toolbar {
 	height:800px;
 }
+
+.appNav .topMenu>li.empty {
+	color: #eee;
+}
