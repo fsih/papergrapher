@@ -12,71 +12,33 @@ pg.tools.broadbrush = function() {
 	var path;
 
 	var options = {
-		minDistance: 10,
-		maxDistance: 45,
-		brushWidth: 60,
-		strokeEnds: 6,
-		endLength: 7,
-		endVariation: 2,
-		endType: 'slime'
+		brushWidth: 60
 	};
 	
 	var components = {
-		minDistance: {
-			type: 'int',
-			label: 'Min distance',
-			min: 10
-		},
-		maxDistance: {
-			type: 'int',
-			label: 'Max distance',
-			min: 45
-		},
 		brushWidth: {
 			type: 'float',
 			label: 'Brush width',
 			min: 0
-		},
-		strokeEnds: {
-			type: 'int',
-			label: 'Stroke ends',
-			min: 0
-		},
-		endLength: {
-			type: 'float',
-			label: 'Ends length',
-			min: 0
-		},
-		endVariation: {
-			type: 'float',
-			label: 'Ends variation',
-			min: 0
-		},
-		endType: {
-			type: 'list',
-			label: 'Ends',
-			options: [ 'linear', 'smooth', 'slime' ]
 		}
 	};
 	
-	
 	var activateTool = function() {
-		
 		// get options from local storage if present
 		options = pg.tools.getLocalOptions(options);
 		tool = new Tool();
-		var lastPoint;
+		var lastPoint, secondLastPoint, lastOptions = options;
 
 		tool.fixedDistance = 1;
 		tool.onMouseDown = function(event) {
-			tool.minDistance = options.minDistance;
-			tool.maxDistance = options.maxDistance;
+			tool.minDistance = options.brushWidth/4;
+			tool.maxDistance = options.brushWidth;
 			if(event.event.button > 0) return;  // only first mouse button
 			
 			path = new Path();
 			path = pg.stylebar.applyActiveToolbarStyle(path);
 			path.add(event.point);
-			lastPoint = event.point;
+			lastPoint = secondLastPoint = event.point;
 		};
 		
 		tool.onMouseDrag = function(event) {
@@ -86,12 +48,15 @@ pg.tools.broadbrush = function() {
 
 			var step = (event.delta).normalize(options.brushWidth/2);
 
+			// Move the first point out away from the drag so that the end of the path is rounded
 			if (path.segments.length === 1) {
 				var removedPoint = path.removeSegment(0).point;
-				debugger;
-				path.add(removedPoint - step);
+				// Add handles to round the end caps
+				var handleVec = step.clone();
+				handleVec.length = options.brushWidth/2;
+				handleVec.angle += 90;
+				path.add(new Segment(removedPoint - step, -handleVec, handleVec));
 			}
-
 			step.angle += 90;
 			var top = event.middlePoint + step;
 			var bottom = event.middlePoint - step;
@@ -105,8 +70,14 @@ pg.tools.broadbrush = function() {
 			path.add(event.point + step);
 			path.insert(0, bottom);
 			path.insert(0, event.point - step);
+			if (path.segments.length === 5) {
+				// Flatten is necessary to prevent smooth from getting rid of the effect
+				// of the handles on the first point.
+				path.flatten(4);
+			}
 			path.smooth();
 			lastPoint = event.point;
+			secondLastPoint = event.middlePoint;
 
 			cc.position = event.point;
 		};
@@ -117,41 +88,60 @@ pg.tools.broadbrush = function() {
 		    fillColor: pg.stylebar.getFillColor()
 		});
 		tool.onMouseMove = function(event) {
-			if(event.event.button > 0) return;  // only first mouse button
-			
-			cc.position = event.point;
-			console.log('move')
+			cc.remove();
+			cc = new Path.Circle({
+			    center: event.point,
+			    radius: options.brushWidth/2,
+			    fillColor: pg.stylebar.getFillColor()
+			});
 		};
 
 		tool.onMouseUp = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
 			
-			var step = (event.point - lastPoint).normalize(options.brushWidth/2);
-			step.angle += 90;
-			var top = event.point + step;
-			var bottom = event.point - step;
-			path.add(top);
-			path.insert(0, bottom);
-			step.angle -= 90;
-			path.add(event.point + step);
-			path.closed = true;
-			path.smooth();
-			path.simplify(1.5);
-			
-			// resettin
-			strokeIndices = [];
-			
-			tool.fixedDistance = 1;
-			pg.undo.snapshot('broadbrush');
-			console.log('up')
+			// If the mouse up is at the same point as the mouse drag event then we need
+			// the second to last point to get the right direction vector for the end cap
+			if (event.point.equals(lastPoint)) {
+				lastPoint = secondLastPoint;
+			}
+			// If the points are still equal, then there was no drag, so just draw a circle.
+			if (event.point.equals(lastPoint)) {
+				path = new Path.Circle({
+				    center: event.point,
+				    radius: options.brushWidth/2,
+				    fillColor: pg.stylebar.getFillColor()
+				});
+			} else {
+				var step = (event.point - lastPoint).normalize(options.brushWidth/2);
+				step.angle += 90;
+				var handleVec = step.clone();
+				handleVec.length = options.brushWidth/2;
 
+				var top = event.point + step;
+				var bottom = event.point - step;
+				path.add(top);
+				path.insert(0, bottom);
+
+				// Add end cap
+				step.angle -= 90;
+				path.add(new Segment(event.point + step, handleVec, -handleVec));
+				path.closed = true;
+				// Flatten is necessary to prevent smooth from getting rid of the effect
+				// of the handles on the end cap
+				path.flatten(4);
+				path.smooth();
+				path.simplify(1);
+			}
+			
+			// reset
+			strokeIndices = [];
+			tool.fixedDistance = 1;
+
+			pg.undo.snapshot('broadbrush');
 		};
 		
 		// setup floating tool options panel in the editor
-		pg.toolOptionPanel.setup(options, components, function() {
-			tool.minDistance = options.minDistance;
-			tool.maxDistance = options.maxDistance;
-		});
+		pg.toolOptionPanel.setup(options, components, function() {});
 		
 		tool.activate();
 	};
@@ -160,5 +150,4 @@ pg.tools.broadbrush = function() {
 		options: options,
 		activateTool : activateTool
 	};
-	
 };
