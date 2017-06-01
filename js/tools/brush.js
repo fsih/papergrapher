@@ -73,11 +73,11 @@ pg.tools.broadbrush = function() {
 			if (path.segments.length === 5) {
 				// Flatten is necessary to prevent smooth from getting rid of the effect
 				// of the handles on the first point.
-				path.flatten(4);
+				path.flatten(options.brushWidth/5);
 			}
 			path.smooth();
 			lastPoint = event.point;
-			secondLastPoint = event.middlePoint;
+			secondLastPoint = event.lastPoint;
 
 			cc.position = event.point;
 		};
@@ -122,15 +122,13 @@ pg.tools.broadbrush = function() {
 				path.add(top);
 				path.insert(0, bottom);
 
+				// Simplify before adding end cap so cap doesn't get warped
+				path.simplify(1);
+
 				// Add end cap
 				step.angle -= 90;
 				path.add(new Segment(event.point + step, handleVec, -handleVec));
 				path.closed = true;
-				// Flatten is necessary to prevent smooth from getting rid of the effect
-				// of the handles on the end cap
-				path.flatten(4);
-				path.smooth();
-				path.simplify(1);
 			}
 			
 			// reset
