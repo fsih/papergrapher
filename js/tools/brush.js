@@ -10,6 +10,7 @@ pg.tools.registerTool({
 pg.tools.broadbrush = function() {
 	var tool;
 	var path;
+	var cc;
 
 	var options = {
 		brushWidth: 60
@@ -27,8 +28,14 @@ pg.tools.broadbrush = function() {
 		// get options from local storage if present
 		options = pg.tools.getLocalOptions(options);
 		tool = new Tool();
-		var lastPoint, secondLastPoint, lastOptions = options;
-
+		var lastPoint, secondLastPoint;
+		
+		cc = new Path.Circle({
+			    center: [-10000, -10000],
+			    radius: options.brushWidth/2,
+			    fillColor: pg.stylebar.getFillColor()
+			});
+		
 		tool.fixedDistance = 1;
 		tool.onMouseDown = function(event) {
 			tool.minDistance = options.brushWidth/4;
@@ -82,11 +89,6 @@ pg.tools.broadbrush = function() {
 			cc.position = event.point;
 		};
 
-		var cc = new Path.Circle({
-		    center: [-1000, -1000],
-		    radius: options.brushWidth/2,
-		    fillColor: pg.stylebar.getFillColor()
-		});
 		tool.onMouseMove = function(event) {
 			cc.remove();
 			cc = new Path.Circle({
@@ -132,7 +134,6 @@ pg.tools.broadbrush = function() {
 			}
 			
 			// reset
-			strokeIndices = [];
 			tool.fixedDistance = 1;
 
 			pg.undo.snapshot('broadbrush');
@@ -143,9 +144,14 @@ pg.tools.broadbrush = function() {
 		
 		tool.activate();
 	};
+
+	var deactivateTool = function() {
+		cc.remove();
+	}
 	
 	return {
 		options: options,
-		activateTool : activateTool
+		activateTool : activateTool,
+		deactivateTool : deactivateTool
 	};
 };

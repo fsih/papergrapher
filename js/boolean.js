@@ -1,7 +1,9 @@
 pg.boolean = function() {
 	
 	var booleanUnite = function(items, replaceWithResult) {
-		items = items || pg.selection.getSelectedItems();
+		if (mode !== "SIMPLE") {
+			items = items || pg.selection.getSelectedItems();
+		}
 		replaceWithResult = replaceWithResult || true;
 		
 		var result;
