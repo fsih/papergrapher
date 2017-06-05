@@ -100,11 +100,46 @@ pg.tools.segmentbrush = function() {
 		tool.onMouseUp = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
 
-			finalPath.simplify(2);
+			// Smooth the path. This tends to cut off large portions of the path!
+			//finalPath.simplify(2);
 
 			// reset
 			tool.fixedDistance = 1;
 
+			pg.undo.snapshot('broadbrush');
+
+			// Get all Path items
+			var items = paper.project.getItems({
+			    'class': Path
+			});
+			for (var i = 0; i < items.length; i++) {
+				// Ignore the cursor preview
+				if (items[i] === cc) { continue; }
+				if (!items[i].intersects(finalPath)) { continue; }
+				if (!items[i].getFillColor()) {
+					// Ignore overlapping a hole (need more logic for this; shape with hole has multiple fill colors)
+				} else if (items[i].getFillColor().equals(finalPath.fillColor)) {
+					// Merge same fill color
+					var newPath = finalPath.unite(items[i]);
+					finalPath.remove();
+					items[i].remove();
+					finalPath = newPath;
+				} else {
+					// Erase different color
+					debugger;
+					var newPath = items[i].subtract(finalPath);
+					if (newPath.children) {
+					    for (var j = newPath.children.length - 1; j >= 0; j--) {
+						    var child = newPath.children[j];
+						    child.copyAttributes(newPath);
+						    child.fillColor = newPath.fillColor;
+						    child.insertAbove(newPath);
+					    }
+				    	newPath.remove();
+					}
+				    items[i].remove();
+				}
+			}
 			pg.undo.snapshot('broadbrush');
 		};
 		

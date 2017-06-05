@@ -262,7 +262,9 @@ pg.input = function() {
 
 		}).on('contextmenu', function (e) {
 			e.preventDefault();
-			pg.menu.showContextMenu(e);
+			if (mode !== "SIMPLE") {
+				pg.menu.showContextMenu(e);
+			}
 		});
 		
 
