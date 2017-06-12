@@ -98,17 +98,23 @@ pg.tools.broadbrush = function() {
 			var layer = paper.project.getItems({
 			    'class': Layer
 			});
+			/*
 			if (layer.length > 1) {
 				console.warn("Multiple layers found.");
 			}
 			layer = layer[0];
+			//TODO: check for parent = layer, so we don't try to merge with children of groups. Having
+			//an issue right now that there are multiple layers.
+			*/
 			// Move down z order to first overlapping item
-			for (var i = 0; i < items.length && !items[i].intersects(finalPath); i++) { continue; }
-			for (; i < items.length; i++) {
+			for (var i = items.length - 1; i >= 0 && !items[i].intersects(finalPath); i--) { continue; }
+			for (; i >= 0; i--) {
+				console.log(items[i].getFillColor().toString());
+				debugger;
 				// Ignore the cursor preview, self, and non-intersecting
 				if (items[i] === cc 
 						|| items[i] === finalPath 
-						|| items[i].parent !== layer // Top-level items only 
+						|| !(items[i].parent instanceof Layer)
 						|| !items[i].intersects(finalPath)) { 
 					continue; 
 				}
@@ -117,6 +123,7 @@ pg.tools.broadbrush = function() {
 				} else if (items[i].getFillColor().equals(finalPath.fillColor)) {
 					// Merge same fill color
 					var newPath = finalPath.unite(items[i]);
+					newPath.insertAbove(items[i]); // Don't drag the existing shape forward
 					finalPath.remove();
 					items[i].remove();
 					finalPath = newPath;
