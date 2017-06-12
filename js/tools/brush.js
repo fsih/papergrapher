@@ -91,16 +91,27 @@ pg.tools.broadbrush = function() {
 		};
 
 		tool.smartMerge = function() {
-			debugger;
 			// Get all Path items
 			var items = paper.project.getItems({
 			    'class': Path
+			});	
+			var layer = paper.project.getItems({
+			    'class': Layer
 			});
+			if (layer.length > 1) {
+				console.warn("Multiple layers found.");
+			}
+			layer = layer[0];
 			// Move down z order to first overlapping item
 			for (var i = 0; i < items.length && !items[i].intersects(finalPath); i++) { continue; }
 			for (; i < items.length; i++) {
-				// Ignore the cursor preview and non-intersecting
-				if (items[i] === cc || items[i] === finalPath || !items[i].intersects(finalPath)) { continue; }
+				// Ignore the cursor preview, self, and non-intersecting
+				if (items[i] === cc 
+						|| items[i] === finalPath 
+						|| items[i].parent !== layer // Top-level items only 
+						|| !items[i].intersects(finalPath)) { 
+					continue; 
+				}
 				if (!items[i].getFillColor()) {
 					// Ignore overlapping a hole (need more logic for this; shape with hole has multiple fill colors)
 				} else if (items[i].getFillColor().equals(finalPath.fillColor)) {
@@ -218,7 +229,14 @@ pg.tools.broadbrush = function() {
 			}
 
 			// Resolve self-crossings
-			finalPath.resolveCrossings().reorient(true /* nonZero */, true /* clockwise */);
+		    var newPath = 
+		    	finalPath
+		    		.resolveCrossings()
+		    		.reorient(true /* nonZero */, true /* clockwise */)
+		    		.reduce({simplify: true});
+		    newPath.copyAttributes(finalPath);
+		    newPath.fillColor = finalPath.fillColor;
+		    finalPath = newPath;
 
 			pg.undo.snapshot('broadbrush');
 		};
