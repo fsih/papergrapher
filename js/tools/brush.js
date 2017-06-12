@@ -107,14 +107,13 @@ pg.tools.broadbrush = function() {
 			//an issue right now that there are multiple layers.
 			*/
 			// Move down z order to first overlapping item
-			for (var i = items.length - 1; i >= 0 && !items[i].intersects(finalPath); i--) { continue; }
+			for (var i = items.length - 1; i >= 0 && !tool.touches(items[i], finalPath); i--) { continue; }
 			for (; i >= 0; i--) {
 				debugger;
-				// Ignore the cursor preview, self, and non-intersecting
+				// Ignore the cursor preview and self
 				if (items[i] === cc 
 						|| items[i] === finalPath 
-						|| !(items[i].parent instanceof Layer)
-						|| !items[i].intersects(finalPath)) { 
+						|| !(items[i].parent instanceof Layer)) { 
 					continue; 
 				}
 				if (!items[i].getFillColor()) {
@@ -143,6 +142,18 @@ pg.tools.broadbrush = function() {
 				}
 			}
 			pg.undo.snapshot('broadbrush');
+		}
+
+		tool.touches = function(path1, path2) {
+			// Two shapes are touching if their paths intersect
+			if (path1.intersects(path2)) {
+				return true;
+			}
+			// Two shapes are also touching if one is completely inside the other
+			if (path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point)) {
+				return true;
+			}
+			return false;
 		}
 
 		// broad brush =======================================================================
@@ -243,8 +254,6 @@ pg.tools.broadbrush = function() {
 		    newPath.copyAttributes(finalPath);
 		    newPath.fillColor = finalPath.fillColor;
 		    finalPath = newPath;
-
-			pg.undo.snapshot('broadbrush');
 		};
 
 		// Segment brush ================================================
@@ -307,8 +316,6 @@ pg.tools.broadbrush = function() {
 
 			// Smooth the path.
 			//finalPath.simplify(2);
-
-			pg.undo.snapshot('broadbrush');
 		};
 		
 		// setup floating tool options panel in the editor

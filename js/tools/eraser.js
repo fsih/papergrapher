@@ -37,9 +37,7 @@ pg.tools.eraser = function() {
 		cc = new Path.Circle({
 			    center: [-10000, -10000],
 			    radius: options.brushWidth/2,
-			    fillColor: 'white',
-			    strokeColor: 'black',
-			    strokeWidth: 1
+			    fillColor: 'white'
 			});
 		
 		tool.fixedDistance = 1;
@@ -50,7 +48,7 @@ pg.tools.eraser = function() {
 			cc = new Path.Circle({
 			    center: event.point,
 			    radius: options.brushWidth/2,
-			    fillColor: pg.stylebar.getFillColor()
+			    fillColor: 'white'
 			});
 		};
 		
@@ -106,13 +104,12 @@ pg.tools.eraser = function() {
 			//TODO: check for parent = layer, so we don't try to merge with children of groups. Having
 			//an issue right now that there are multiple layers.
 			*/
-			for (; i >= 0; i--) {
-				debugger;
+			for (var i = items.length - 1; i >= 0; i--) {
 				// Ignore the cursor preview, self, and non-intersecting
 				if (items[i] === cc 
 						|| items[i] === finalPath 
 						|| !(items[i].parent instanceof Layer)
-						|| !items[i].intersects(finalPath)) { 
+						|| !tool.touches(items[i], finalPath)) { 
 					continue; 
 				}
 				var newPath = items[i].subtract(finalPath);
@@ -127,7 +124,20 @@ pg.tools.eraser = function() {
 				}
 			    items[i].remove();
 			}
+			finalPath.remove();
 			pg.undo.snapshot('eraser');
+		}
+
+		tool.touches = function(path1, path2) {
+			// Two shapes are touching if their paths intersect
+			if (path1.intersects(path2)) {
+				return true;
+			}
+			// Two shapes are also touching if one is completely inside the other
+			if (path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point)) {
+				return true;
+			}
+			return false;
 		}
 
 		// broad brush =======================================================================
@@ -136,8 +146,9 @@ pg.tools.eraser = function() {
 			tool.maxDistance = options.brushWidth;
 			if(event.event.button > 0) return;  // only first mouse button
 			
-			finalPath = new Path();
-			finalPath = pg.stylebar.applyActiveToolbarStyle(finalPath);
+			finalPath = new Path({
+			    fillColor: 'white'
+			});
 			finalPath.add(event.point);
 			lastPoint = secondLastPoint = event.point;
 		};
@@ -197,7 +208,7 @@ pg.tools.eraser = function() {
 				finalPath = new Path.Circle({
 				    center: event.point,
 				    radius: options.brushWidth/2,
-				    fillColor: pg.stylebar.getFillColor()
+				    fillColor: 'white'
 				});
 			} else {
 				var step = (event.point - lastPoint).normalize(options.brushWidth/2);
@@ -228,8 +239,6 @@ pg.tools.eraser = function() {
 		    newPath.copyAttributes(finalPath);
 		    newPath.fillColor = finalPath.fillColor;
 		    finalPath = newPath;
-
-			pg.undo.snapshot('eraser');
 		};
 
 		// Segment brush ================================================
@@ -241,7 +250,7 @@ pg.tools.eraser = function() {
 			finalPath = new Path.Circle({
 			    center: event.point,
 			    radius: options.brushWidth/2,
-			    fillColor: pg.stylebar.getFillColor()
+			    fillColor: 'white'
 			});
 			lastPoint = event.point;
 		};
@@ -256,8 +265,9 @@ pg.tools.eraser = function() {
 			handleVec.length = options.brushWidth/2;
 			handleVec.angle += 90;
 
-			var path = new Path();
-			path = pg.stylebar.applyActiveToolbarStyle(path);
+			var path = new Path({
+			    fillColor: 'white'
+			});
 			// Add handles to round the end caps
 			path.add(new Segment(lastPoint - step, -handleVec, handleVec));
 			step.angle += 90;
@@ -292,8 +302,6 @@ pg.tools.eraser = function() {
 
 			// Smooth the path.
 			//finalPath.simplify(2);
-
-			pg.undo.snapshot('eraser');
 		};
 		
 		// setup floating tool options panel in the editor
