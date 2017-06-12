@@ -109,7 +109,6 @@ pg.tools.broadbrush = function() {
 			// Move down z order to first overlapping item
 			for (var i = items.length - 1; i >= 0 && !items[i].intersects(finalPath); i--) { continue; }
 			for (; i >= 0; i--) {
-				console.log(items[i].getFillColor().toString());
 				debugger;
 				// Ignore the cursor preview, self, and non-intersecting
 				if (items[i] === cc 
