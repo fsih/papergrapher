@@ -64,7 +64,7 @@ pg.tools.pen = function() {
 				path.closePath(true);
 			}
 			path.simplify(options.smoothPath);
-			pg.undo.snapshot('draw');
+			pg.undo.snapshot('pen');
 			
 		};
 		
