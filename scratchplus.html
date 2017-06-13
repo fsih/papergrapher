@@ -13,7 +13,7 @@
 	<link href="css/styles.css" rel="stylesheet" />
 	<link href="css/toolbar.css" rel="stylesheet" />
 	<link href="css/toolOptionPanel.css" rel="stylesheet" />
-	<link href="css/simple.css" rel="stylesheet" />
+	<link href="css/scratchplus.css" rel="stylesheet" />
 </head>
 <body>
 	<canvas id="paperCanvas" data-paper-resize="false" data-paper-hidpi="off"></canvas>
@@ -111,7 +111,7 @@
 			<div class="colorSwitchButton" id="colorSwitchButton" title="Switch colors"></div>
 		</div>
 		
-		<div id="opacitySection" class="opacitySection toolbarSection extraSpace hidden">
+		<div id="opacitySection" class="opacitySection toolbarSection extraSpace">
 			<label class="toolbarLabel">Opacity</label>
 			<input type="number"  min="0" max="100" maxlength="3" id="opacityInput" value="100" class="opacityInput comboInput" title="Opacity"/>
 			<select id="opacitySelect" class="opacitySelect comboSelect" title="Opacity">
@@ -130,7 +130,7 @@
 			</select>
 		</div>
 		
-		<div id="blendModeSection" class="blendModeSection toolbarSection extraSpace hidden">
+		<div id="blendModeSection" class="blendModeSection toolbarSection extraSpace">
 			<label class="toolbarLabel">Blending</label>
 			<select id="blendModeSelect" class="blendModeSelect" title="Blend mode">
 				<option value="normal" selected>Normal</option>
@@ -168,7 +168,7 @@
 			</select>
 		</div>
 		
-		<div id="strokeSection" class="strokeSection toolbarSection extraSpace hidden">
+		<div id="strokeSection" class="strokeSection toolbarSection extraSpace">
 			<label class="toolbarLabel">Stroke</label>
 			<input type="number"  min="0" maxlength="3" id="strokeInput" value="1" class="strokeInput"/>
 			<div class="strokeButtons">
@@ -209,7 +209,7 @@
 	<script src="js/lib/opentype.min.js"></script>
 
 	<!-- application -->
-	<script src="js/simple.js"></script>
+	<script>var mode = "SCRATCH_PLUS"</script>
 	<script src="js/init.js"></script>
 	<script src="js/settings.js"></script>
 	<script src="js/document.js"></script>
@@ -246,20 +246,12 @@
 	
 	<script src="js/tools/select.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
 	<script src="js/tools/detailselect.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
-	<script src="js/tools/brush.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
-	<script src="js/tools/eraser.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
-	<!-- <script src="js/tools/segmentbrush.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script> -->
-	<!-- <script src="js/tools/eraser.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script> -->
-	<!-- <script src="js/tools/fill.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script> --> -->
+	<script src="js/tools/pen.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
+	<script src="js/tools/bezier.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
 	<script src="js/tools/text.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
 	<script src="js/tools/eyedropper.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
 	<script src="js/tools/circle.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
 	<script src="js/tools/rectangle.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
-	<!-- <script src="js/tools/rotate.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script> -->
-	<!-- <script src="js/tools/scale.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script> -->
-	<!-- <script src="js/tools/zoom.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script> -->
-	<script src="js/tools/viewgrab.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
-	<script src="js/tools/viewzoom.js" type="text/paperscript" data-paper-canvas="paperCanvas"></script>
 
 	<!-- dev -->
 	<script src="js/dev.js"></script>

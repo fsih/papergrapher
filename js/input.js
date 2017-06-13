@@ -262,7 +262,7 @@ pg.input = function() {
 
 		}).on('contextmenu', function (e) {
 			e.preventDefault();
-			if (mode !== "SIMPLE") {
+			if (mode === "ORIGINAL") {
 				pg.menu.showContextMenu(e);
 			}
 		});

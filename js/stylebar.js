@@ -179,7 +179,7 @@ pg.stylebar = function() {
 
 
 	var getStrokeColor = function() {
-		if (mode === "SIMPLE") {
+		if (mode === "BLOB") {
 			return null;
 		}
 		var value = jQuery("#strokeColorInput").spectrum("get");
@@ -559,7 +559,7 @@ pg.stylebar = function() {
 			setStrokeWidth(1);
 		}
 
-		if (mode === "SIMPLE") {
+		if (mode === "BLOB") {
 			pg.stylebar.setStrokeColor('rgba(0,0,0,0)');
 			pg.stylebar.setStrokeWidth(0);
 		}

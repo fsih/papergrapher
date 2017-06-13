@@ -9,7 +9,7 @@ pg.menu = function() {
 
 
 	var setupNavigationLogic = function() {
-		if (mode === "SIMPLE") {
+		if (mode === "BLOB") {
 			return;
 		}
 		
