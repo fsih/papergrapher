@@ -1,7 +1,10 @@
 # papergrapher
 Vector Editor based on Paper.js
 
-A working version can be found at https://papergrapher.vol-2.com
+A working version can be found at:
+Original papergrapher: https://fsih.github.io/papergrapher
+Prototype 1: https://fsih.github.io/papergrapher/blob.html
+Prototype 2: https://fsih.github.io/papergrapher/scratchplus.html
 
 To run locally:
 npm install -g http-server
