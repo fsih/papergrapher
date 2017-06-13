@@ -127,18 +127,6 @@ pg.tools.broadbrush = function() {
 					finalPath = newPath;
 				} else {
 					break; // stop when you reach a different color. Doesn't touch paths with z index lower than last non-matching color
-					// // Erase different color
-					// var newPath = items[i].subtract(finalPath);
-					// if (newPath.children) {
-					//     for (var j = newPath.children.length - 1; j >= 0; j--) {
-					// 	    var child = newPath.children[j];
-					// 	    child.copyAttributes(newPath);
-					// 	    child.fillColor = newPath.fillColor;
-					// 	    child.insertAbove(newPath);
-					//     }
-				 //    	newPath.remove();
-					// }
-				 //    items[i].remove();
 				}
 			}
 			pg.undo.snapshot('broadbrush');

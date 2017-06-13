@@ -91,8 +91,14 @@ pg.tools.eraser = function() {
 		tool.smartMerge = function() {
 			// Get all Path items
 			var items = paper.project.getItems({
-			    'class': Path
+			    'class': Path,
+			    'selected': true
 			});	
+			if (items.length === 0) {
+				items = paper.project.getItems({
+				    'class': Path
+				});	
+			}
 			var layer = paper.project.getItems({
 			    'class': Layer
 			});
@@ -118,7 +124,7 @@ pg.tools.eraser = function() {
 					    var child = newPath.children[j];
 					    child.copyAttributes(newPath);
 					    child.fillColor = newPath.fillColor;
-					    child.insertAbove(newPath);
+					    child.insertAbove(items[i]);
 				    }
 			    	newPath.remove();
 				}
