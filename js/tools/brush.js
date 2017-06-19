@@ -304,6 +304,7 @@ pg.tools.broadbrush = function() {
 
 			// Smooth the path.
 			//finalPath.simplify(2);
+			//console.log(finalPath.segments);
 		};
 		
 		// setup floating tool options panel in the editor
