@@ -107,13 +107,15 @@ pg.tools.broadbrush = function() {
 			//an issue right now that there are multiple layers.
 			*/
 			// Move down z order to first overlapping item
-			for (var i = items.length - 1; i >= 0 && !tool.touches(items[i], finalPath); i--) { continue; }
+			debugger;
+			for (var i = items.length - 1; 
+					i >= 0 && (!tool.isMergeable(finalPath, items[i]) || !tool.touches(items[i], finalPath));
+					i--) {
+				continue; 
+			}
 			for (; i >= 0; i--) {
-				debugger;
 				// Ignore the cursor preview and self
-				if (items[i] === cc 
-						|| items[i] === finalPath 
-						|| !(items[i].parent instanceof Layer)) { 
+				if (!tool.isMergeable(finalPath, items[i])) { 
 					continue; 
 				}
 				if (!items[i].getFillColor()) {
@@ -135,13 +137,21 @@ pg.tools.broadbrush = function() {
 		tool.touches = function(path1, path2) {
 			// Two shapes are touching if their paths intersect
 			if (path1.intersects(path2)) {
+				console.log('intersects shape: '+path1);
 				return true;
 			}
 			// Two shapes are also touching if one is completely inside the other
 			if (path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point)) {
+				console.log('hits shape: '+path1);
 				return true;
 			}
 			return false;
+		}
+
+		tool.isMergeable = function(newPath, existingPath) {
+			return existingPath !== cc  // don't merge with the mouse preview
+				&& existingPath !== newPath // don't merge with self
+				&& existingPath.parent instanceof Layer; // don't merge with nested in group
 		}
 
 		// broad brush =======================================================================
@@ -300,7 +310,7 @@ pg.tools.broadbrush = function() {
 			if(event.event.button > 0) return;  // only first mouse button
 
 			// TODO: This smoothing tends to cut off large portions of the path! Would like to eventually
-			// add back smoothing, maybe a custom implementation?
+			// add back smoothing, maybe a custom implementation that only applies to a subset of the line?
 
 			// Smooth the path.
 			//finalPath.simplify(2);

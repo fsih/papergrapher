@@ -71,13 +71,6 @@ pg.tools.line = function() {
 				hitPath.setSelected(false);
 				hitPath = null;
 			}
-			
-			// TODO add some sort of highlighting for which point I'm about to clip to
-			// if (hitPath) {
-			// 	for (var i = 0; i < hitPath.segments.length; i++) {
-			// 		hitPath.segment[i].setSelected(false);
-			// 	}
-			// }
 
 			if (path && path.firstSegment.point.getDistance(event.point, true) < tool.tolerance() * tool.tolerance()) {
 				hitPoint = path.firstSegment;
