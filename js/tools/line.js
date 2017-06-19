@@ -23,7 +23,7 @@ pg.tools.line = function() {
 		var hitOptions = {
 			ends: true,
 			guide: false,
-			tolerance: 60 / paper.view.zoom
+			tolerance: 6
 		};
 		tool.onMouseDown = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
@@ -76,7 +76,7 @@ pg.tools.line = function() {
 			// 	}
 			// }
 
-			if (path && path.firstSegment.point.getDistance(event.point, true) < hitOptions.tolerance * hitOptions.tolerance) {
+			if (path && path.firstSegment.point.getDistance(event.point, true) < tool.tolerance() * tool.tolerance()) {
 				hitPoint = path.firstSegment;
 			} else {
 				var hitResult = paper.project.hitTest(event.point, hitOptions);
@@ -105,7 +105,7 @@ pg.tools.line = function() {
 			hitPoint = null;
 			hitPath = null;
 
-			if (path && path.segments.length > 3 && path.firstSegment.point.getDistance(event.point) < hitOptions.tolerance) {
+			if (path && path.segments.length > 3 && path.firstSegment.point.getDistance(event.point) < tool.tolerance()) {
 				hitPoint = path.firstSegment;
 			} else {
 				var hitResult = paper.project.hitTest(event.point, hitOptions);
@@ -143,7 +143,7 @@ pg.tools.line = function() {
 			if(event.event.button > 0) return;  // only first mouse button
 
 			// If I single clicked, don't do anything
-			if (path.segments.length < 2 || path.segments.length === 2 && path.firstSegment.point.getDistance(path.lastSegment.point) < hitOptions.tolerance) {
+			if (path.segments.length < 2 || path.segments.length === 2 && path.firstSegment.point.getDistance(path.lastSegment.point) < tool.tolerance()) {
 				path.remove();
 				path = null;
 				return;
@@ -186,6 +186,10 @@ pg.tools.line = function() {
 			}
 			return null;
 		};
+
+		tool.tolerance = function() {
+			return hitOptions.tolerance / paper.view.zoom;
+		}
 		
 		tool.activate();
 	};
