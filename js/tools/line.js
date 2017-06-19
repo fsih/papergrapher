@@ -67,7 +67,10 @@ pg.tools.line = function() {
 			// If near another path's endpoint, or this path's beginpoint, clip to it to suggest
 			// joining/closing the paths.
 			hitPoint = null;
-			hitPath = null;
+			if (hitPath) {
+				hitPath.setSelected(false);
+				hitPath = null;
+			}
 			
 			// TODO add some sort of highlighting for which point I'm about to clip to
 			// if (hitPath) {
@@ -82,9 +85,10 @@ pg.tools.line = function() {
 				var hitResult = paper.project.hitTest(event.point, hitOptions);
 				if (hitResult && hitResult.item && hitResult.item !== path && !hitResult.item.closed) {
 					hitPath = hitResult.item;
+					console.log(hitResult);
 				}
 				if (hitPath) {
-					//hitPath.setSelected(true);
+					hitPath.setSelected(true);
 					var result = tool.findHandle(hitPath, event.point);
 					if (result) {
 						if (result.segment.index === hitPath.segments.length - 1) {
