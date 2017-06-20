@@ -89,9 +89,6 @@ pg.tools.reshapecurve = function() {
 			if(lastEvent) {
 				if((event.event.timeStamp - lastEvent.event.timeStamp) < 250) {
 					doubleClicked = true;
-					if (!event.modifiers.shift) {
-						pg.selection.clearSelection();
-					}
 				} else {
 					doubleClicked = false;
 				}
@@ -114,14 +111,16 @@ pg.tools.reshapecurve = function() {
 				return;
 			}
 				
-			if(hitResult.type === 'fill' || doubleClicked) {
-
+			if(hitResult.type === 'fill' || (hitResult.type !== 'segment' && doubleClicked)) {
 				hitType = 'fill';
 				if(hitResult.item.selected) {
 					if(event.modifiers.shift) {
 						hitResult.item.fullySelected = false;
 					}
 					if(doubleClicked) {
+						if (!event.modifiers.shift) {
+							pg.selection.clearSelection();
+						}
 						hitResult.item.selected = false;
 						hitResult.item.fullySelected = true;
 					}
@@ -139,8 +138,26 @@ pg.tools.reshapecurve = function() {
 					}
 				}
 
-			} else if(hitResult.type === 'segment') {
+			} else if (hitResult.type === 'segment') {
 				hitType = 'point';
+ 				
+ 				if (doubleClicked) {
+ 					var index = hitResult.segment.index
+					hitResult.item.removeSegment(index);
+
+				 	// Adjust handles of curve before and curve after to account for new curve length
+					var beforeSegment = hitResult.item.segments[index - 1];
+					var afterSegment = hitResult.item.segments[index];
+					var curveLength = beforeSegment ? beforeSegment.curve ? beforeSegment.curve.length : undefined : undefined;
+					if (beforeSegment) {
+						beforeSegment.handleOut = beforeSegment.handleOut / beforeSegment.handleOut.length * curveLength/2;
+					}
+					if (afterSegment) {
+						afterSegment.handleIn = afterSegment.handleIn / afterSegment.handleIn.length * curveLength/2;
+					}
+
+					return;
+				}
 
 				if(hitResult.segment.selected) {
 					// selected points with no handles get handles if selected again
@@ -148,7 +165,6 @@ pg.tools.reshapecurve = function() {
 					if(event.modifiers.shift) {
 						hitResult.segment.selected = false;
 					}
-
 				} else {
 					if(event.modifiers.shift) {
 						hitResult.segment.selected = true;
@@ -158,9 +174,7 @@ pg.tools.reshapecurve = function() {
 					}
 				}
 				
-				if(event.modifiers.option) pg.selection.cloneSelection();
-
-
+				if(event.modifiers.option) pg.selection.cloneSelection(); // TODO ??
 			} else if (
 				hitResult.type === 'stroke' || 
 				hitResult.type === 'curve') {
@@ -208,11 +222,6 @@ pg.tools.reshapecurve = function() {
 					 	segment.selected = true;
 					}
 				}
-
-				console.log(hitResult);
-
-				//if(event.modifiers.option) pg.selection.cloneSelection();
-
 			} else if(
 				hitResult.type === 'handle-in' || 
 				hitResult.type === 'handle-out') {
