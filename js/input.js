@@ -118,7 +118,7 @@ pg.input = function() {
 
 
 			// alt
-			if(event.keyCode === 18) {
+			if(event.keyCode === 18 && mode === "ORIGINAL") {
 				// if viewZoom is active and we just released alt,
 				// reset tool to previous
 				if(pg.toolbar.getActiveTool().options.id === 'viewzoom') {

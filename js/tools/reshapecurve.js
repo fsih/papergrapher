@@ -161,21 +161,33 @@ pg.tools.reshapecurve = function() {
 				if(event.modifiers.option) pg.selection.cloneSelection();
 
 
-			} else if(
+			} else if (
 				hitResult.type === 'stroke' || 
 				hitResult.type === 'curve') {
-				// hitType = 'curve';
+				hitType = 'point';
 
-				var curve = hitResult.location.curve;
-				if(event.modifiers.shift) {
-				 	curve.selected = !curve.selected;
-
-				} else if(!curve.selected) {
-				 	paper.project.deselectAll();
-				 	hitResult.item.selected = true;
+				var item = hitResult.item;
+				if (!item.selected) {
+					if (event.modifiers.shift) {
+						item.selected = !item.selected;
+					} else {
+					 	paper.project.deselectAll();
+					 	item.selected = true;
+					}
+				} else {
+					// todo add handles
+				 	var segment = hitResult.item.insert(hitResult.location.index + 1, hitResult.location.point);
+					if (event.modifiers.shift) {
+						segment.selected = !segment.selected;
+					} else {
+					 	paper.project.deselectAll();
+					 	segment.selected = true;
+					}
 				}
 
-				// if(event.modifiers.option) pg.selection.cloneSelection();
+				console.log(hitResult);
+
+				//if(event.modifiers.option) pg.selection.cloneSelection();
 
 			} else if(
 				hitResult.type === 'handle-in' || 
