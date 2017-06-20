@@ -175,8 +175,32 @@ pg.tools.reshapecurve = function() {
 					 	item.selected = true;
 					}
 				} else {
-					// todo add handles
-				 	var segment = hitResult.item.insert(hitResult.location.index + 1, hitResult.location.point);
+					// Length of curve from previous point to new point
+					var beforeCurveLength = hitResult.location.curveOffset;
+					var afterCurveLength = hitResult.location.curve.length - hitResult.location.curveOffset;
+
+					// Handle length based on curve length until next point
+					var handleIn = -hitResult.location.tangent * beforeCurveLength / 2;
+					var handleOut = hitResult.location.tangent * afterCurveLength / 2;
+					// Don't let one handle overwhelm the other (results in path doubling back on itself weirdly)
+					if (handleIn.length > 3 * handleOut.length) {
+						handleIn = handleIn/handleIn.length * 3 * handleOut.length;
+					}
+					if (handleOut.length > 3 * handleIn.length) {
+						handleOut = handleOut/handleOut.length * 3 * handleIn.length;
+					}
+
+					var beforeSegment = hitResult.item.segments[hitResult.location.index];
+					var afterSegment = hitResult.item.segments[hitResult.location.index + 1];
+
+					// Add segment
+				 	var segment = hitResult.item.insert(hitResult.location.index + 1, 
+				 		new Segment(hitResult.location.point, handleIn, handleOut));
+
+				 	// Adjust handles of curve before and curve after to account for new curve length
+					beforeSegment.handleOut = beforeSegment.handleOut / beforeSegment.handleOut.length * beforeCurveLength/2;
+					afterSegment.handleIn = afterSegment.handleIn / afterSegment.handleIn.length * afterCurveLength/2;
+
 					if (event.modifiers.shift) {
 						segment.selected = !segment.selected;
 					} else {
