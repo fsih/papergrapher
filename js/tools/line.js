@@ -17,40 +17,26 @@ pg.tools.line = function() {
 		tool = new Tool();
 		
 		var path;
-		var hitPoint = null;
-		var hitPath = null;
+		var hitResult = null;
+		var tolerance = 6;
 
-		var hitOptions = {
-			ends: true,
-			guide: false,
-			tolerance: 6
-		};
 		tool.onMouseDown = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
 
-			// If you click near a point, continue that line instead of making a new line
-			hitPath = null;
 			if (path) {
 				path.setSelected(false);
 				path = null;
 			}
-			var hitResult = paper.project.hitTest(event.point, hitOptions);
-			if (hitResult && hitResult.item && !hitResult.item.closed) {
-				hitPath = hitResult.item;
-			}
 
-			if (hitPath) {
-				var result = tool.findHandle(hitPath, event.point);
-				if (result) {
-					if (result.segment.index === 0) {
-						hitPath.firstSegment.setSelected(true);
-						hitPath.reverse();
-					} else if (result.segment.index === hitPath.segments.length - 1) {
-						hitPath.lastSegment.setSelected(true);
-					}
-					path = hitPath;
-					path.add(result.segment); // Add second point, which is what will move when dragged
+			// If you click near a point, continue that line instead of making a new line
+			hitResult = tool.findLineEnd(event.point);
+			if (hitResult) {
+				path = hitResult.path;
+				if (hitResult.isFirst) {
+					path.reverse();
 				}
+				path.lastSegment.setSelected(true);
+				path.add(hitResult.segment); // Add second point, which is what will move when dragged
 			}
 
 			// If not near other path, start a new path
@@ -66,69 +52,62 @@ pg.tools.line = function() {
 		tool.onMouseMove = function(event) {
 			// If near another path's endpoint, or this path's beginpoint, clip to it to suggest
 			// joining/closing the paths.
-			hitPoint = null;
-			if (hitPath) {
-				hitPath.setSelected(false);
-				hitPath = null;
+			if (hitResult) {
+				hitResult.path.setSelected(false);
+				hitResult = null;
 			}
 
 			if (path && path.firstSegment.point.getDistance(event.point, true) < tool.tolerance() * tool.tolerance()) {
-				hitPoint = path.firstSegment;
+				hitResult = {
+					path: path,
+					segment: path.firstSegment,
+					isFirst: true
+				};
 			} else {
-				var hitResult = paper.project.hitTest(event.point, hitOptions);
-				if (hitResult && hitResult.item && hitResult.item !== path && !hitResult.item.closed) {
-					hitPath = hitResult.item;
-					console.log(hitResult);
-				}
-				if (hitPath) {
-					hitPath.setSelected(true);
-					var result = tool.findHandle(hitPath, event.point);
-					if (result) {
-						if (result.segment.index === hitPath.segments.length - 1) {
-							hitPath.reverse();
-						}
-						hitPath.firstSegment.setSelected(true);
-						hitPoint = result.segment;
-					}
+				hitResult = tool.findLineEnd(event.point);
+			}
+
+			if (hitResult) {
+				var hitPath = hitResult.path;
+				hitPath.setSelected(true);
+				if (hitResult.isFirst) {
+					hitPath.firstSegment.setSelected(true);
+				} else {
+					hitPath.lastSegment.setSelected(true);
 				}
 			}
-		}
+		};
 		
 		tool.onMouseDrag = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
 			// If near another path's endpoint, or this path's beginpoint, clip to it to suggest
 			// joining/closing the paths.
-			if (hitPath && hitPath !== path) hitPath.setSelected(false);
-			hitPoint = null;
-			hitPath = null;
+			if (hitResult && hitResult.path !== path) hitResult.path.setSelected(false);
+			hitResult = null;
 
-			if (path && path.segments.length > 3 && path.firstSegment.point.getDistance(event.point) < tool.tolerance()) {
-				hitPoint = path.firstSegment;
+			if (path && path.segments.length > 3 && path.firstSegment.point.getDistance(event.point, true) < tool.tolerance() * tool.tolerance()) {
+				hitResult = {
+					path: path,
+					segment: path.firstSegment,
+					isFirst: true
+				};
 			} else {
-				var hitResult = paper.project.hitTest(event.point, hitOptions);
-				if (hitResult && hitResult.item && hitResult.item !== path && !hitResult.item.closed) {
-					hitPath = hitResult.item;
-				}
-				if (hitPath) {
+				hitResult = tool.findLineEnd(event.point, path);
+				if (hitResult) {
+					var hitPath = hitResult.path;
 					hitPath.setSelected(true);
-					var result = tool.findHandle(hitPath, event.point);
-					if (result) {
-						if (result.segment.index === hitPath.segments.length - 1) {
-							hitPath.reverse();
-						}
+					if (hitResult.isFirst) {
 						hitPath.firstSegment.setSelected(true);
-						hitPoint = result.segment;
+					} else {
+						hitPath.lastSegment.setSelected(true);
 					}
 				}
 			}
 
-			if (hitPoint) {
-				//console.log(hitPoint);
-			}
-
+			// snapping
 			if (path) {
-				if (hitPoint) {
-					path.lastSegment.point = hitPoint.point;
+				if (hitResult) {
+					path.lastSegment.point = hitResult.segment.point;
 				} else {
 					path.lastSegment.point = event.point;
 				}
@@ -140,44 +119,64 @@ pg.tools.line = function() {
 			if(event.event.button > 0) return;  // only first mouse button
 
 			// If I single clicked, don't do anything
-			if (path.segments.length < 2 || path.segments.length === 2 && path.firstSegment.point.getDistance(path.lastSegment.point) < tool.tolerance()) {
+			if (path.segments.length < 2 || path.segments.length === 2 && path.firstSegment.point.getDistance(event.point, true) < tool.tolerance() * tool.tolerance()) {
 				path.remove();
 				path = null;
 				return;
-			}
-			else if (path.lastSegment.point.equals(path.segments[path.segments.length - 2].point)) {
+			} else if (path.lastSegment.point.getDistance(path.segments[path.segments.length - 2].point, true) < tool.tolerance() * tool.tolerance()) {
 				path.removeSegment(path.segments.length - 1);
 				return;
 			}
 			
 			// If I intersect other line end points, join or close
-			if (hitPoint) {
-				if (path.firstSegment === hitPoint) {
-					path.removeSegment(path.segments.length - 1);
+			debugger;
+			if (hitResult) {
+				path.removeSegment(path.segments.length - 1);
+				if (path.firstSegment === hitResult.segment) {
+					// close path
 					path.closed = true;
 					path.setSelected(false);
 				} else {
+					debugger;
 					// joining two paths
-					path.removeSegment(path.segments.length - 1);
-					path.join(hitPath);
+					if (!hitResult.isFirst) {
+						hitResult.path.reverse();
+					}
+					path.join(hitResult.path);
 				}
-				hitPoint = null;
+				hitResult = null;
 			}
 
-			// Reset
 			if (path) {
 				pg.undo.snapshot('line');
 			}
 			
 		};
 	
-		tool.findHandle = function(path, point) {
-			for (var i = 0, l = path.segments.length; i < l; i += l-1) {
-				var segment = path.segments[i];
-				var distance = (point - segment.point).length;
-				if (distance < hitOptions.tolerance) {
+		tool.findLineEnd = function(point, excludePath) {
+			var lines = paper.project.getItems({
+			    'class': Path
+			});	
+			// Slightly prefer more recent lines
+			for (var i = lines.length - 1; i >= 0; i--) {
+				if (lines[i].closed) {
+					continue;
+				}
+				if (excludePath && lines[i] === excludePath) {
+					continue;
+				}
+				if (lines[i].firstSegment && lines[i].firstSegment.point.getDistance(point, true) < tool.tolerance() * tool.tolerance()) {
 					return {
-						segment: segment
+						path: lines[i],
+						segment: lines[i].firstSegment,
+						isFirst: true
+					};
+				}
+				if (lines[i].lastSegment && lines[i].lastSegment.point.getDistance(point, true) < tool.tolerance() * tool.tolerance()) {
+					return {
+						path: lines[i],
+						segment: lines[i].lastSegment,
+						isFirst: false
 					};
 				}
 			}
@@ -185,8 +184,8 @@ pg.tools.line = function() {
 		};
 
 		tool.tolerance = function() {
-			return hitOptions.tolerance / paper.view.zoom;
-		}
+			return tolerance / paper.view.zoom;
+		};
 		
 		tool.activate();
 	};
