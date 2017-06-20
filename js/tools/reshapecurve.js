@@ -1,189 +1,372 @@
-// bezier tool
-// adapted from the paperjs examples (Tools/BezierTool.html)
+// select tool
+// adapted from resources on http://paperjs.org and 
+// https://github.com/memononen/stylii
 
 pg.tools.registerTool({
 	id: 'reshapecurve',
-	name: 'Reshape Curve',
+	name: 'Reshape curve',
 	usedKeys : {
-		toolbar : 'c'
+		toolbar : 'a'
 	}
 });
 
-pg.tools.bezier = function() {
+pg.tools.reshapecurve = function() {
 	var tool;
+	var keyModifiers = {};
 	
 	var options = {};
 	
-	var activateTool = function() {
-		tool = new Tool();
+	var menuEntries = {
+		selectionTitle: {
+			type : 'title',
+			text :'Selection'
+		},
+		selectAll: {
+			type: 'button',
+			label: 'Select all',
+			click: 'pg.selection.selectAllSegments'
+		},
+		selectNone: {
+			type: 'button',
+			label: 'Deselect all',
+			click: 'pg.selection.clearSelection'
+		},
+		invertSelection: {
+			type: 'button',
+			label: 'Invert selection',
+			click: 'pg.selection.invertSegmentSelection'
+		},
+		segmentTitle: {
+			type : 'title',
+			text :'Segment'
+		},
+		switchHandles: {
+			type: 'button',
+			label: 'Switch handles',
+			click: 'pg.selection.switchSelectedHandles'
+		},
+		removeSegments: {
+			type: 'button',
+			label: 'Remove segments',
+			click: 'pg.selection.removeSelectedSegments'
+		},
+		splitPath: {
+			type: 'button',
+			label: 'Split path',
+			click: 'pg.selection.splitPathAtSelectedSegments'
+		},
 		
-		var path;
+	};
 
-		var currentSegment;
-		var mode;
-		var type;
-		var hoveredItem = null;
-		
+	var activateTool = function() {		
+		tool = new Tool();
+				
 		var hitOptions = {
 			segments: true,
 			stroke: true,
 			curves: true,
+			handles: true,
+			fill: true,
 			guide: false,
-			tolerance: 5 / paper.view.zoom
+			tolerance: 3 / paper.view.zoom
 		};
+		
+		var doRectSelection = false;
+		var selectionRect;
+		
+		var hitType;
+		
+		var lastEvent = null;
+		var selectionDragged = false;
 		
 		tool.onMouseDown = function(event) {
-			if(event.event.button > 0) return;  // only first mouse button
+			if(event.event.button > 0) return; // only first mouse button
 			
-			if (currentSegment) {
-				currentSegment.selected = false;
-			}
-			mode = type = currentSegment = null;
+			selectionDragged = false;
 			
-			if(!path) {
-				if(!hoveredItem) {
-					pg.selection.clearSelection();
-					path = new Path();
-					path = pg.stylebar.applyActiveToolbarStyle(path);
-					
+			var doubleClicked = false;
+			
+			if(lastEvent) {
+				if((event.event.timeStamp - lastEvent.event.timeStamp) < 250) {
+					doubleClicked = true;
+					if (!event.modifiers.shift) {
+						pg.selection.clearSelection();
+					}
 				} else {
-					if(!hoveredItem.item.closed) {
-						mode = 'continue';
-						path = hoveredItem.item;
-						currentSegment = hoveredItem.segment;
-						if(hoveredItem.item.lastSegment !== hoveredItem.segment) {
-							path.reverse();
-						}
-						
-					} else {
-						path = hoveredItem.item;
-					}
+					doubleClicked = false;
 				}
-				
+			}
+			lastEvent = event;
+			
+			hitType = null;
+			pg.hover.clearHoveredItem();
+			var hitResult = paper.project.hitTest(event.point, hitOptions);
+			if (!hitResult) {
+				if (!event.modifiers.shift) {
+					pg.selection.clearSelection();
+				}
+				doRectSelection = true;
+				return;
 			}
 			
-			if(path) {
-				var result = findHandle(path, event.point);
-				if (result && mode !== 'continue') {
-					currentSegment = result.segment;
-					type = result.type;
-					if (result.type === 'point') {
-						if( result.segment.index === 0 && 
-							path.segments.length > 1 &&
-							!path.closed) {
-							mode = 'close';
-							path.closed = true;
-							path.firstSegment.selected = true;
-							
-						} else {
-							mode = 'remove';
-							result.segment.remove();
-							
-						}
-					}
-				}
-
-				
-				if (!currentSegment) {
-					if(hoveredItem) {
-						if(hoveredItem.type === 'segment' && 
-							!hoveredItem.item.closed) {
-						
-							// joining two paths
-							var hoverPath = hoveredItem.item;
-							// check if the connection point is the first segment
-							// reverse path if it is not because join() 
-							// always connects to first segment)
-							if(hoverPath.firstSegment !== hoveredItem.segment) {
-								hoverPath.reverse();
-							}
-							path.join(hoverPath);
-							path = null;
-
-						} else if(hoveredItem.type === 'curve' || 
-							hoveredItem.type === 'stroke') {
-						
-							mode = 'add';
-							// inserting segment on curve/stroke
-							var location = hoveredItem.location;
-							currentSegment = path.insert(location.index + 1, event.point);
-							currentSegment.selected = true;
-						}
-
-					} else {
-						mode = 'add';
-						// add a new segment to the path
-						currentSegment = path.add(event.point);
-						currentSegment.selected = true;
-						
-					}
-				}
-				
-				
+			// dont allow detail-selection of PGTextItem
+			if(hitResult && pg.item.isPGTextItem(pg.item.getRootItem(hitResult.item))) {
+				return;
 			}
+				
+			if(hitResult.type === 'fill' || doubleClicked) {
+
+				hitType = 'fill';
+				if(hitResult.item.selected) {
+					if(event.modifiers.shift) {
+						hitResult.item.fullySelected = false;
+					}
+					if(doubleClicked) {
+						hitResult.item.selected = false;
+						hitResult.item.fullySelected = true;
+					}
+					if(event.modifiers.option) pg.selection.cloneSelection();
+
+				} else {
+					if(event.modifiers.shift) {
+						hitResult.item.fullySelected = true;
+					} else {
+						paper.project.deselectAll();
+						hitResult.item.fullySelected = true;
+
+
+						if(event.modifiers.option) pg.selection.cloneSelection();
+					}
+				}
+
+			} else if(hitResult.type === 'segment') {
+				hitType = 'point';
+
+				if(hitResult.segment.selected) {
+					// selected points with no handles get handles if selected again
+					hitResult.segment.selected = true;
+					if(event.modifiers.shift) {
+						hitResult.segment.selected = false;
+					}
+
+				} else {
+					if(event.modifiers.shift) {
+						hitResult.segment.selected = true;
+					} else {
+						paper.project.deselectAll();
+						hitResult.segment.selected = true;
+					}
+				}
+				
+				if(event.modifiers.option) pg.selection.cloneSelection();
+
+
+			} else if(
+				hitResult.type === 'stroke' || 
+				hitResult.type === 'curve') {
+				// hitType = 'curve';
+
+				var curve = hitResult.location.curve;
+				if(event.modifiers.shift) {
+				 	curve.selected = !curve.selected;
+
+				} else if(!curve.selected) {
+				 	paper.project.deselectAll();
+				 	hitResult.item.selected = true;
+				}
+
+				// if(event.modifiers.option) pg.selection.cloneSelection();
+
+			} else if(
+				hitResult.type === 'handle-in' || 
+				hitResult.type === 'handle-out') {
+				hitType = hitResult.type;
+
+				if(!event.modifiers.shift) {
+					paper.project.deselectAll();
+				}
+				
+				hitResult.segment.handleIn.selected = true;
+				hitResult.segment.handleOut.selected = true;
+
+				var seg = hitResult.segment;
+			}
+			
+			pg.statusbar.update();
 		};
 		
-		tool.onMouseMove = function(event) {			
-			var hitResult = paper.project.hitTest(event.point, hitOptions);
-			if(hitResult && hitResult.item && hitResult.item.selected) {
-				hoveredItem = hitResult;
-				
-			} else {
-				hoveredItem = null;
-			}
+		tool.onMouseMove = function(event) {
+			pg.hover.handleHoveredItem(hitOptions, event);
 		};
 		
 		tool.onMouseDrag = function(event) {
-			if(event.event.button > 0) return;  // only first mouse button
+			if(event.event.button > 0) return; // only first mouse button
 			
-			var delta = event.delta.clone();
-			if (type === 'handleOut' || mode === 'add') {
-				delta = -delta;
+			if(doRectSelection) {
+				selectionRect = pg.guides.rectSelect(event);
+				// Remove this rect on the next drag and up event
+				selectionRect.removeOnDrag();
+
+			} else {
+				doRectSelection = false;
+				selectionDragged = true;
+				
+				var selectedItems = pg.selection.getSelectedItems();
+				var dragVector = (event.point - event.downPoint);
+				
+				for(var i=0; i < selectedItems.length; i++) {
+					var item = selectedItems[i];
+
+					if(hitType === 'fill' || !item.segments) {
+						
+						// if the item has a compound path as a parent, don't move its
+						// own item, as it would lead to double movement
+						if(item.parent && pg.compoundPath.isCompoundPath(item.parent)) {
+							continue;
+						}
+						
+						// add the position of the item before the drag started
+						// for later use in the snap calculation
+						if(!item.origPos) {
+							item.origPos = item.position;
+						}
+
+						if (event.modifiers.shift) {
+							item.position = item.origPos + 
+							pg.math.snapDeltaToAngle(dragVector, Math.PI*2/8);
+
+						} else {
+							item.position += event.delta;
+						}
+
+					} else {
+						for(var j=0; j < item.segments.length; j++) {
+							var seg = item.segments[j];
+							// add the point of the segment before the drag started
+							// for later use in the snap calculation
+							if(!seg.origPoint) {
+								seg.origPoint = seg.point.clone();
+							}
+
+							if( seg.selected && (
+								hitType === 'point' || 
+								hitType === 'stroke' || 
+								hitType === 'curve')){
+
+								if (event.modifiers.shift) {
+									seg.point = seg.origPoint + 
+									pg.math.snapDeltaToAngle(dragVector, Math.PI*2/8);
+
+								} else {
+									seg.point += event.delta;
+								}
+
+							} else if(seg.handleOut.selected && 
+								hitType === 'handle-out'){
+								//if option is pressed or handles have been split, 
+								//they're no longer parallel and move independently
+								if( event.modifiers.option ||
+									!seg.handleOut.isColinear(seg.handleIn)) {
+									seg.handleOut += event.delta;
+
+								} else {
+									var oldLength = seg.handleOut.length;
+									seg.handleOut += event.delta;
+									seg.handleIn = -seg.handleOut * seg.handleIn.length/oldLength;
+								}
+
+							} else if(seg.handleIn.selected && 
+								hitType === 'handle-in') {
+
+								//if option is pressed or handles have been split, 
+								//they're no longer parallel and move independently
+								if( event.modifiers.option ||
+									!seg.handleOut.isColinear(seg.handleIn)) {
+									seg.handleIn += event.delta;
+
+								} else {
+									var oldLength = seg.handleIn.length;
+									seg.handleIn += event.delta;
+									seg.handleOut = -seg.handleIn * seg.handleOut.length/oldLength;
+								}	
+							}
+						}
+						
+					}
+				}
 			}
-			currentSegment.handleIn += delta;
-			currentSegment.handleOut -= delta;
 		};
-		
+
 		tool.onMouseUp = function(event) {
-			if(event.event.button > 0) return;  // only first mouse button
-			
-			if(path && path.closed) {
-				pg.undo.snapshot('bezier');
-				path = null;
+			if(event.event.button > 0) return; // only first mouse button
+		
+			if(doRectSelection && selectionRect) {
+				pg.selection.processRectangularSelection(event, selectionRect, 'detail');
+				selectionRect.remove();
+				
+			} else {
+				
+				if(selectionDragged) {
+					pg.undo.snapshot('moveSelection');
+					selectionDragged = false;
+				}
+				
+				// resetting the items and segments origin points for the next usage
+				var selectedItems = pg.selection.getSelectedItems();
+
+				for(var i=0; i < selectedItems.length; i++) {
+					var item = selectedItems[i];
+					// for the item
+					item.origPos = null;
+					// and for all segments of the item
+					if(item.segments) {
+						for(var j=0; j < item.segments.length; j++) {
+							var seg = item.segments[j];
+								seg.origPoint = null;
+						}
+					}
+				}
 			}
 			
+			doRectSelection = false;
+			selectionRect = null;
+
 		};
 		
+		tool.onKeyDown = function(event) {
+			keyModifiers[event.key] = true;
+		};
 		
+		tool.onKeyUp = function(event) {
+			if(keyModifiers.control) {
+				if(event.key == 'a') {
+					pg.selection.selectAllSegments();
+				} else if(event.key == 'i') {
+					pg.selection.invertSegmentSelection();
+				}
+			}
+			keyModifiers[event.key] = false;
+		};
+		
+		// setup floating tool options panel in the editor
+		//pg.toolOptionPanel.setup(options, components, function(){ });
+		
+		pg.menu.setupToolEntries(menuEntries);
 		
 		tool.activate();
 	};
-	
-	var findHandle = function(path, point) {
-		var types = ['point', 'handleIn', 'handleOut'];
-		for (var i = 0, l = path.segments.length; i < l; i++) {
-			for (var j = 0; j < 3; j++) {
-				var type = types[j];
-				var segment = path.segments[i];
-				var segmentPoint = type === 'point'
-						? segment.point
-						: segment.point + segment[type];
-				var distance = (point - segmentPoint).length;
-				if (distance < 6) {
-					return {
-						type: type,
-						segment: segment
-					};
-				}
-			}
-		}
-		return null;
-	};
 
 	
+	var deactivateTool = function() {
+		pg.hover.clearHoveredItem();
+		pg.menu.clearToolEntries();
+	};
+
+
 	return {
 		options: options,
-		activateTool : activateTool
+		activateTool: activateTool,
+		deactivateTool: deactivateTool
 	};
 	
 };

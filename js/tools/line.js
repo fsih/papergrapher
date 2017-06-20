@@ -129,7 +129,6 @@ pg.tools.line = function() {
 			}
 			
 			// If I intersect other line end points, join or close
-			debugger;
 			if (hitResult) {
 				path.removeSegment(path.segments.length - 1);
 				if (path.firstSegment === hitResult.segment) {
@@ -137,7 +136,6 @@ pg.tools.line = function() {
 					path.closed = true;
 					path.setSelected(false);
 				} else {
-					debugger;
 					// joining two paths
 					if (!hitResult.isFirst) {
 						hitResult.path.reverse();
