@@ -112,19 +112,38 @@ pg.tools.eraser = function() {
 			*/
 			for (var i = items.length - 1; i >= 0; i--) {
 				// Ignore the cursor preview, self, and non-intersecting
-				if (items[i] === cc 
-						|| items[i] === finalPath 
-						|| !(items[i].parent instanceof Layer)
+				if (!tool.isMergeable(finalPath, items[i])
 						|| !tool.touches(items[i], finalPath)) { 
 					continue; 
 				}
+				var clockwiseChildren = [];
+				var ccwChildren = [];
 				var newPath = items[i].subtract(finalPath);
 				if (newPath.children) {
 				    for (var j = newPath.children.length - 1; j >= 0; j--) {
 					    var child = newPath.children[j];
-					    child.copyAttributes(newPath);
-					    child.fillColor = newPath.fillColor;
-					    child.insertAbove(items[i]);
+					    if (child.isClockwise()) {
+					    	clockwiseChildren.push(child);
+					    } else {
+					    	ccwChildren.push(child);
+					    }
+					}
+				    for (j = 0; j < clockwiseChildren.length; j++) {
+					    var cw = clockwiseChildren[j];
+					    cw.copyAttributes(newPath);
+					    cw.fillColor = newPath.fillColor;
+					    cw.insertAbove(items[i]);
+					    for (var k = 0; k < ccwChildren.length; k++) {
+					    	var ccw = ccwChildren[k];
+					    	if (tool.enclosesOrExcloses(ccw, cw)) {
+					    		cw.subtract(ccw);
+					    		cw.remove();
+					    		// TODO add this new thing to the pool of things to subtract from. (Interaction with shapes with holes)
+					    		// TODO Figure out how to get touches only in the filled region.
+
+					    		// TODO consider removing clockwise from the pool
+					    	}
+					    }
 				    }
 			    	newPath.remove();
 				}
@@ -137,13 +156,26 @@ pg.tools.eraser = function() {
 		tool.touches = function(path1, path2) {
 			// Two shapes are touching if their paths intersect
 			if (path1.intersects(path2)) {
+				console.log('intersects shape: '+path1);
 				return true;
 			}
+			return tool.enclosesOrExcloses(path1, path2);
+		}
+
+		// Enopens??
+		tool.enclosesOrExcloses = function(path1, path2) {
 			// Two shapes are also touching if one is completely inside the other
 			if (path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point)) {
+				console.log('hits shape: '+path1);
 				return true;
 			}
 			return false;
+		}
+
+		tool.isMergeable = function(newPath, existingPath) {
+			return existingPath !== cc  // don't merge with the mouse preview
+				&& existingPath !== newPath // don't merge with self
+				&& existingPath.parent instanceof Layer; // don't merge with nested in group
 		}
 
 		// broad brush =======================================================================
