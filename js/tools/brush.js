@@ -313,7 +313,7 @@ pg.tools.broadbrush = function() {
 			// add back smoothing, maybe a custom implementation that only applies to a subset of the line?
 
 			// Smooth the path.
-			//finalPath.simplify(2);
+			finalPath.simplify(2);
 			//console.log(finalPath.segments);
 		};
 		

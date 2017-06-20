@@ -149,10 +149,10 @@ pg.tools.reshapecurve = function() {
 					var beforeSegment = hitResult.item.segments[index - 1];
 					var afterSegment = hitResult.item.segments[index];
 					var curveLength = beforeSegment ? beforeSegment.curve ? beforeSegment.curve.length : undefined : undefined;
-					if (beforeSegment) {
+					if (beforeSegment && beforeSegment.handleOut) {
 						beforeSegment.handleOut = beforeSegment.handleOut / beforeSegment.handleOut.length * curveLength/2;
 					}
-					if (afterSegment) {
+					if (afterSegment && afterSegment.handleIn) {
 						afterSegment.handleIn = afterSegment.handleIn / afterSegment.handleIn.length * curveLength/2;
 					}
 
