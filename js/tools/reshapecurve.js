@@ -243,8 +243,20 @@ pg.tools.reshapecurve = function() {
 				 		new Segment(hitResult.location.point, handleIn, handleOut));
 
 				 	// Adjust handles of curve before and curve after to account for new curve length
-					beforeSegment.handleOut = beforeSegment.handleOut / beforeSegment.handleOut.length * beforeCurveLength/2;
-					afterSegment.handleIn = afterSegment.handleIn / afterSegment.handleIn.length * afterCurveLength/2;
+				 	if (beforeSegment && beforeSegment.handleOut) {
+						if (!afterSegment) {
+							beforeSegment.handleOut = null;
+						} else {
+							beforeSegment.handleOut = beforeSegment.handleOut / beforeSegment.handleOut.length * beforeCurveLength/2;
+						}
+					}
+					if (afterSegment && afterSegment.handleIn) {
+						if (!beforeSegment) {
+							afterSegment.handleIn = null;
+						} else {
+							afterSegment.handleIn = afterSegment.handleIn / afterSegment.handleIn.length * afterCurveLength/2;
+						}
+					}
 
 					if (event.modifiers.shift) {
 						segment.selected = !segment.selected;
