@@ -91,9 +91,9 @@ pg.tools.broadbrush = function() {
 		};
 
 		tool.smartMerge = function() {
-			// Get all Path items
-			var items = paper.project.getItems({
-			    'class': Path
+			// Get all path items to merge with
+			var paths = paper.project.getItems({
+			    'class': PathItem
 			});	
 			var layer = paper.project.getItems({
 			    'class': Layer
@@ -107,24 +107,25 @@ pg.tools.broadbrush = function() {
 			//an issue right now that there are multiple layers.
 			*/
 			// Move down z order to first overlapping item
-			for (var i = items.length - 1; 
-					i >= 0 && (!tool.isMergeable(finalPath, items[i]) || !tool.touches(items[i], finalPath));
+			for (var i = paths.length - 1; 
+					i >= 0 && (!tool.isMergeable(finalPath, paths[i]) || !tool.touches(paths[i], finalPath));
 					i--) {
 				continue; 
 			}
 			for (; i >= 0; i--) {
 				// Ignore the cursor preview and self
-				if (!tool.isMergeable(finalPath, items[i])) { 
+				if (!tool.isMergeable(finalPath, paths[i])) { 
 					continue; 
 				}
-				if (!items[i].getFillColor()) {
-					// Ignore overlapping a hole (need more logic for this; shape with hole has multiple fill colors)
-				} else if (items[i].getFillColor().equals(finalPath.fillColor)) {
+				if (!paths[i].getFillColor()) {
+					console.warn('No fill color: ');
+					console.warn(paths[i]);
+				} else if (paths[i].getFillColor().equals(finalPath.fillColor)) {
 					// Merge same fill color
-					var newPath = finalPath.unite(items[i]);
-					newPath.insertAbove(items[i]); // Don't drag the existing shape forward
+					var newPath = finalPath.unite(paths[i]);
+					newPath.insertAbove(paths[i]); // Don't drag the existing shape forward
 					finalPath.remove();
-					items[i].remove();
+					paths[i].remove();
 					finalPath = newPath;
 				} else {
 					break; // stop when you reach a different color. Doesn't touch paths with z index lower than last non-matching color
@@ -140,10 +141,12 @@ pg.tools.broadbrush = function() {
 				return true;
 			}
 			// Two shapes are also touching if one is completely inside the other
-			if (path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point)) {
+			if (path1.firstSegment && path1.firstSegment.point && path2.firstSegment && path2.firstSegment.point 
+				    && path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point)) {
 				console.log('hits shape: '+path1);
 				return true;
 			}
+			// TODO clean up these no-point paths
 			return false;
 		}
 
@@ -312,7 +315,7 @@ pg.tools.broadbrush = function() {
 			// add back smoothing, maybe a custom implementation that only applies to a subset of the line?
 
 			// Smooth the path.
-			finalPath.simplify(2);
+			//finalPath.simplify(2);
 			//console.log(finalPath.segments);
 		};
 		

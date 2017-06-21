@@ -209,9 +209,7 @@ pg.menu = function() {
 			if(entry.type == 'button') {
 				var classString = entry.class ? ' '+entry.class : '' ;
 				var $toolButton = jQuery('<li class="button toolSpecific'+classString+'" data-click="'+entry.click+'">'+entry.label+'</li>');
-				debugger;
 				$toolButton.click(function() {
-					debugger;
 					var func = jQuery(this).attr('data-click');
 					pg.helper.executeFunctionByName(func, window);
 					setTimeout(function() {
