@@ -126,7 +126,6 @@ pg.tools.segmentbrush = function() {
 					finalPath = newPath;
 				} else {
 					// Erase different color
-					debugger;
 					var newPath = items[i].subtract(finalPath);
 					if (newPath.children) {
 					    for (var j = newPath.children.length - 1; j >= 0; j--) {

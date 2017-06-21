@@ -163,6 +163,34 @@ pg.tools.select = function() {
 		}
 	};
 
+	var simpleMenuEntries = {
+		copySelection: {
+			type: 'button',
+			label: 'Copy',
+			click: 'pg.edit.copySelectionToClipboard'
+		},
+		pasteSelection: {
+			type: 'button',
+			label: 'Paste',
+			click: 'pg.edit.pasteObjectsFromClipboard'
+		},
+		deleteSelection: {
+			type: 'button',
+			label: 'Delete',
+			click: 'pg.selection.deleteSelection'
+		},
+		bringToFront: {
+			type: 'button',
+			label: 'Bring to front',
+			click: 'pg.order.bringSelectionToFront'
+		},
+		sendToBack: {
+			type: 'button',
+			label: 'Send to back',
+			click: 'pg.order.sendSelectionToBack'
+		}
+	};
+
 	var activateTool = function() {		
 		setSelectionBounds();
 		preProcessSelection();
@@ -451,9 +479,12 @@ pg.tools.select = function() {
 		
 		// setup floating tool options panel in the editor
 		//pg.toolOptionPanel.setup(options, components, function(){ });
-		
-		pg.menu.setupToolEntries(menuEntries);
-		
+
+		if (mode === "ORIGINAL") {
+			pg.menu.setupToolEntries(menuEntries);
+		} else {
+			pg.menu.setupToolEntries(simpleMenuEntries);
+		}		
 		tool.activate();
 	};
 

@@ -23,3 +23,7 @@ body {
 .appNav .topMenu>li.empty {
 	color: #eee;
 }
+
+.placeholder {
+	width: 60px;
+}

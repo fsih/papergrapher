@@ -58,6 +58,29 @@ pg.tools.reshapecurve = function() {
 		
 	};
 
+	var simpleMenuEntries = {
+		selectAll: {
+			type: 'button',
+			label: 'Select all',
+			click: 'pg.selection.selectAllSegments'
+		},
+		selectNone: {
+			type: 'button',
+			label: 'Deselect all',
+			click: 'pg.selection.clearSelection'
+		},
+		removeSegments: {
+			type: 'button',
+			label: 'Remove segments',
+			click: 'pg.selection.removeSelectedSegments'
+		},
+		splitPath: {
+			type: 'button',
+			label: 'Split path',
+			click: 'pg.selection.splitPathAtSelectedSegments'
+		}
+	};
+
 	var activateTool = function() {		
 		tool = new Tool();
 				
@@ -404,8 +427,11 @@ pg.tools.reshapecurve = function() {
 		// setup floating tool options panel in the editor
 		//pg.toolOptionPanel.setup(options, components, function(){ });
 		
-		pg.menu.setupToolEntries(menuEntries);
-		
+		if (mode === "ORIGINAL") {
+			pg.menu.setupToolEntries(menuEntries);
+		} else {
+			pg.menu.setupToolEntries(simpleMenuEntries);
+		}	
 		tool.activate();
 	};
 

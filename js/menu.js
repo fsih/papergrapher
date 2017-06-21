@@ -9,7 +9,7 @@ pg.menu = function() {
 
 
 	var setupNavigationLogic = function() {
-		if (mode === "BLOB") {
+		if (mode !== "ORIGINAL") {
 			return;
 		}
 		
@@ -65,7 +65,6 @@ pg.menu = function() {
 	
 	
 	var setupFileSection = function() {
-		
 		jQuery('.clearDocument_button').click(function() {
 			if (confirm('Clear the document permanently?')) {
 				pg.document.clear();
@@ -99,7 +98,6 @@ pg.menu = function() {
 		jQuery('.redo_button').click(function() {
 			pg.undo.redo();
 		});
-		
 		
 		// handle change on hidden file input in menu item
 		jQuery('#fileUploadImage').on('change', function(event) {
@@ -205,6 +203,32 @@ pg.menu = function() {
 		jQuery('#toolSubMenu').empty().parent().addClass('empty');
 	};
 	
+	var setupToolEntriesTopLevel = function(entries) {
+		var $toolMenu = jQuery('#topMenu');	
+		jQuery.each(entries, function(index, entry) {
+			if(entry.type == 'button') {
+				var classString = entry.class ? ' '+entry.class : '' ;
+				var $toolButton = jQuery('<li class="button toolSpecific'+classString+'" data-click="'+entry.click+'">'+entry.label+'</li>');
+				debugger;
+				$toolButton.click(function() {
+					debugger;
+					var func = jQuery(this).attr('data-click');
+					pg.helper.executeFunctionByName(func, window);
+					setTimeout(function() {
+						hideMenus();
+					}, 100);
+				});
+				$toolMenu.append($toolButton);
+			}
+			
+		});
+		setupNavigationLogic();
+	};
+	
+	
+	var clearToolEntriesTopLevel = function() {
+		$('.toolSpecific').remove();
+	};
 
 	var showContextMenu = function(event) {
 	
@@ -259,15 +283,25 @@ pg.menu = function() {
 		new pg.modal.floater('appInfoWindow', 'Info', html, 300, 100);
 	};
 	
-	
-	return {
-		setup:setup,
-		setupToolEntries: setupToolEntries,
-		clearToolEntries: clearToolEntries,
-		showContextMenu:showContextMenu,
-		hideContextMenu:hideContextMenu,
-		showAboutModal: showAboutModal
-	};
+	if (mode === "ORIGINAL") {
+		return {
+			setup:setup,
+			setupToolEntries: setupToolEntries,
+			clearToolEntries: clearToolEntries,
+			showContextMenu:showContextMenu,
+			hideContextMenu:hideContextMenu,
+			showAboutModal: showAboutModal
+		};
+	} else {
+		return {
+			setup:setup,
+			setupToolEntries: setupToolEntriesTopLevel,
+			clearToolEntries: clearToolEntriesTopLevel,
+			showContextMenu:showContextMenu,
+			hideContextMenu:hideContextMenu,
+			showAboutModal: showAboutModal
+		};
+	}
 	
 }();
 

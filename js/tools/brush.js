@@ -107,7 +107,6 @@ pg.tools.broadbrush = function() {
 			//an issue right now that there are multiple layers.
 			*/
 			// Move down z order to first overlapping item
-			debugger;
 			for (var i = items.length - 1; 
 					i >= 0 && (!tool.isMergeable(finalPath, items[i]) || !tool.touches(items[i], finalPath));
 					i--) {
