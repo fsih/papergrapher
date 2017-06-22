@@ -91,12 +91,12 @@ pg.tools.eraser = function() {
 		tool.smartMerge = function() {
 			// Get all Path items
 			var items = paper.project.getItems({
-			    'class': Path,
+			    'class': PathItem,
 			    'selected': true
 			});	
 			if (items.length === 0) {
 				items = paper.project.getItems({
-				    'class': Path
+				    'class': PathItem
 				});	
 			}
 			var layer = paper.project.getItems({
@@ -116,6 +116,7 @@ pg.tools.eraser = function() {
 						|| !tool.touches(items[i], finalPath)) { 
 					continue; 
 				}
+				// Assume that result of erase operation returns clockwise paths for positive shapes
 				var clockwiseChildren = [];
 				var ccwChildren = [];
 				var newPath = items[i].subtract(finalPath);
@@ -133,15 +134,17 @@ pg.tools.eraser = function() {
 					    cw.copyAttributes(newPath);
 					    cw.fillColor = newPath.fillColor;
 					    cw.insertAbove(items[i]);
-					    for (var k = 0; k < ccwChildren.length; k++) {
+					    
+					    // Go backward since we are deleting elements
+					    var newCw = cw;
+					    for (var k = ccwChildren.length - 1; k >= 0; k--) {
 					    	var ccw = ccwChildren[k];
 					    	if (tool.enclosesOrExcloses(ccw, cw)) {
-					    		cw.subtract(ccw);
-					    		cw.remove();
-					    		// TODO add this new thing to the pool of things to subtract from. (Interaction with shapes with holes)
-					    		// TODO Figure out how to get touches only in the filled region.
-
-					    		// TODO consider removing clockwise from the pool
+					    		var temp = newCw.subtract(ccw);
+					    		newCw.remove();
+					    		newCw = temp;
+					    		ccw.remove();
+					    		ccwChildren.splice(k, 1);
 					    	}
 					    }
 				    }
@@ -165,7 +168,7 @@ pg.tools.eraser = function() {
 		// Enopens??
 		tool.enclosesOrExcloses = function(path1, path2) {
 			// Two shapes are also touching if one is completely inside the other
-			if (path1.firstSegment && path1.firstSegment.point && path2.firstSegment && path2.firstSegment.point 
+			if (path1 && path1.firstSegment && path1.firstSegment.point && path2 && path2.firstSegment && path2.firstSegment.point 
 				    && path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point)) {
 				console.log('hits shape: '+path1);
 				return true;
