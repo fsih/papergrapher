@@ -95,44 +95,33 @@ pg.tools.broadbrush = function() {
 			var paths = paper.project.getItems({
 			    'class': PathItem
 			});	
-			var layer = paper.project.getItems({
-			    'class': Layer
-			});
-			/*
-			if (layer.length > 1) {
-				console.warn("Multiple layers found.");
-			}
-			layer = layer[0];
-			//TODO: check for parent = layer, so we don't try to merge with children of groups. Having
-			//an issue right now that there are multiple layers.
-			*/
-			// Move down z order to first overlapping item
-			for (var i = paths.length - 1; 
-					i >= 0 && (!tool.isMergeable(finalPath, paths[i]) || !tool.touches(paths[i], finalPath));
-					i--) {
-				continue; 
+
+			var origPath = finalPath;
+			// Move down z order to first overlapping item, ignoring the cursor preview and self
+			for (var i = paths.length - 1; i >= 0 && (!tool.isMergeable(finalPath, paths[i]) || !tool.touches(paths[i], origPath)); i--) {
+				continue;
 			}
 			for (; i >= 0; i--) {
-				// Ignore the cursor preview and self
-				if (!tool.isMergeable(finalPath, paths[i])) { 
-					continue; 
+				if (!tool.isMergeable(finalPath, paths[i])) {
+					continue;
 				}
 				if (!paths[i].getFillColor()) {
 					console.warn('No fill color: ');
 					console.warn(paths[i]);
-				} else if (paths[i].getFillColor().equals(finalPath.fillColor)) {
+				} else if (paths[i].getFillColor().equals(finalPath.fillColor) && tool.touches(paths[i], origPath)) {
 					// Merge same fill color
 					var newPath = finalPath.unite(paths[i]);
 					newPath.insertAbove(paths[i]); // Don't drag the existing shape forward
 					finalPath.remove();
 					paths[i].remove();
+					paths.splice(i, 1);
 					finalPath = newPath;
 				} else {
 					break; // stop when you reach a different color. Doesn't touch paths with z index lower than last non-matching color
 				}
 			}
 			pg.undo.snapshot('broadbrush');
-		}
+		};
 
 		tool.touches = function(path1, path2) {
 			// Two shapes are touching if their paths intersect
@@ -142,19 +131,19 @@ pg.tools.broadbrush = function() {
 			}
 			// Two shapes are also touching if one is completely inside the other
 			if (path1 && path1.firstSegment && path1.firstSegment.point && path2 && path2.firstSegment && path2.firstSegment.point 
-				    && path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point)) {
+				    && (path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point))) {
 				console.log('hits shape: '+path1);
 				return true;
 			}
 			// TODO clean up these no-point paths
 			return false;
-		}
+		};
 
 		tool.isMergeable = function(newPath, existingPath) {
 			return existingPath !== cc  // don't merge with the mouse preview
 				&& existingPath !== newPath // don't merge with self
 				&& existingPath.parent instanceof Layer; // don't merge with nested in group
-		}
+		};
 
 		// broad brush =======================================================================
 		tool.onBroadMouseDown = function(event) {
@@ -192,7 +181,6 @@ pg.tools.broadbrush = function() {
 				finalPath.removeSegment(finalPath.segments.length - 1);
 				finalPath.removeSegment(0);
 			}
-			//path.selected = true;
 			finalPath.add(top);
 			finalPath.add(event.point + step);
 			finalPath.insert(0, bottom);
@@ -286,7 +274,6 @@ pg.tools.broadbrush = function() {
 			path.add(new Segment(lastPoint - step, -handleVec, handleVec));
 			step.angle += 90;
 
-			path.selected = true;
 			path.add(event.lastPoint + step);
 			path.insert(0, event.lastPoint - step);
 			path.add(event.point + step);
