@@ -488,7 +488,6 @@ pg.tools.select = function() {
 		tool.activate();
 	};
 
-
 	var deactivateTool = function() {
 		pg.hover.clearHoveredItem();
 		removeBoundsPath();

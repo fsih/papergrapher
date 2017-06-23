@@ -35,21 +35,22 @@ pg.tools.eraser = function() {
 		var THRESHOLD = 20;
 		
 		cc = new Path.Circle({
-			    center: [-10000, -10000],
-			    radius: options.brushWidth/2,
-			    fillColor: 'white'
-			});
+		    center: [-10000, -10000],
+		    radius: options.brushWidth/2,
+			strokeColor: 'cornflowerblue',
+			fillColor: 'white',
+			strokeWidth: 1
+		});
 		
 		tool.fixedDistance = 1;
 
 
 		tool.onMouseMove = function(event) {
-			cc.remove();
-			cc = new Path.Circle({
-			    center: event.point,
-			    radius: options.brushWidth/2,
-			    fillColor: 'white'
-			});
+			if (options.brushWidth/2 !== cc.radius) {
+				cc.radius = options.brushWidth/2;
+			}
+			cc.bringToFront();
+			cc.position = event.point;
 		};
 		
 		tool.onMouseDown = function(event) {
@@ -60,6 +61,8 @@ pg.tools.eraser = function() {
 				brush = SEGMENT;
 				this.onSegmentMouseDown(event);
 			}
+			cc.bringToFront();
+			cc.position = event.point;
 		};
 
 		tool.onMouseDrag = function(event) {
@@ -70,6 +73,8 @@ pg.tools.eraser = function() {
 			} else {
 				console.warn("Brush type does not exist: ", brush);
 			}
+			cc.bringToFront();
+			cc.position = event.point;
 		};
 
 		tool.onMouseUp = function(event) {
@@ -82,6 +87,8 @@ pg.tools.eraser = function() {
 			}
 
 			tool.smartMerge();
+			cc.bringToFront();
+			cc.position = event.point;
 
 			// Reset
 			brush = undefined;
@@ -197,8 +204,6 @@ pg.tools.eraser = function() {
 		
 		tool.onBroadMouseDrag = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
-			
-			cc.position = event.point;
 
 			var step = (event.delta).normalize(options.brushWidth/2);
 
@@ -232,8 +237,6 @@ pg.tools.eraser = function() {
 			finalPath.smooth();
 			lastPoint = event.point;
 			secondLastPoint = event.lastPoint;
-
-			cc.position = event.point;
 		};
 
 		tool.onBroadMouseUp = function(event) {
@@ -299,8 +302,6 @@ pg.tools.eraser = function() {
 		
 		tool.onSegmentMouseDrag = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
-			
-			cc.position = event.point;
 
 			var step = (event.delta).normalize(options.brushWidth/2);
 			var handleVec = step.clone();
@@ -333,7 +334,6 @@ pg.tools.eraser = function() {
 			path.remove();
 			finalPath.remove();
 			finalPath = newPath;
-			cc.position = event.point;
 		};
 
 		tool.onSegmentMouseUp = function(event) {
