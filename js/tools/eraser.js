@@ -133,6 +133,8 @@ pg.tools.eraser = function() {
 					    var cw = clockwiseChildren[j];
 					    cw.copyAttributes(newPath);
 					    cw.fillColor = newPath.fillColor;
+						cw.strokeColor = newPath.strokeColor;
+						cw.strokeWidth = newPath.strokeWidth;
 					    cw.insertAbove(items[i]);
 					    
 					    // Go backward since we are deleting elements
