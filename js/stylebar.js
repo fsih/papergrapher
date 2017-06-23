@@ -562,6 +562,9 @@ pg.stylebar = function() {
 		if (mode === "BLOB") {
 			pg.stylebar.setStrokeColor('rgba(0,0,0,0)');
 			pg.stylebar.setStrokeWidth(0);
+		} else if (mode === "BLOBS_PLUS") {
+			setFillColor('rgb(250,165,29)');
+			pg.stylebar.setStrokeColor('rgb(0,0,0,0)');
 		}
 
 	};

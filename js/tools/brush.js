@@ -96,9 +96,9 @@ pg.tools.broadbrush = function() {
 			    'class': PathItem
 			});	
 
-			var origPath = finalPath;
+			var pathAdded = finalPath;
 			// Move down z order to first overlapping item, ignoring the cursor preview and self
-			for (var i = paths.length - 1; i >= 0 && (!tool.isMergeable(finalPath, paths[i]) || !tool.touches(paths[i], origPath)); i--) {
+			for (var i = paths.length - 1; i >= 0 && (!tool.isMergeable(finalPath, paths[i]) || !tool.touches(paths[i], pathAdded)); i--) {
 				continue;
 			}
 			for (; i >= 0; i--) {
@@ -108,7 +108,7 @@ pg.tools.broadbrush = function() {
 				if (!paths[i].getFillColor()) {
 					console.warn('No fill color: ');
 					console.warn(paths[i]);
-				} else if (paths[i].getFillColor().equals(finalPath.fillColor) && tool.touches(paths[i], origPath)) {
+				} else if (tool.colorMatch(paths[i], pathAdded)) {
 					// Merge same fill color
 					var newPath = finalPath.unite(paths[i]);
 					newPath.insertAbove(paths[i]); // Don't drag the existing shape forward
@@ -123,21 +123,29 @@ pg.tools.broadbrush = function() {
 			pg.undo.snapshot('broadbrush');
 		};
 
+		tool.colorMatch = function(existingPath, addedPath) {
+			return existingPath.getFillColor().equals(addedPath.getFillColor()) 
+			        && addedPath.getStrokeColor() === null 
+			        && tool.touches(existingPath, addedPath);
+		}
+
 		tool.touches = function(path1, path2) {
 			// Two shapes are touching if their paths intersect
 			if (path1.intersects(path2)) {
-				console.log('intersects shape: '+path1);
 				return true;
 			}
+			return tool.firstEnclosesSecond(path1, path2) || tool.firstEnclosesSecond(path2, path1);
+		}
+
+		tool.firstEnclosesSecond = function(path1, path2) {
 			// Two shapes are also touching if one is completely inside the other
-			if (path1 && path1.firstSegment && path1.firstSegment.point && path2 && path2.firstSegment && path2.firstSegment.point 
-				    && (path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point))) {
-				console.log('hits shape: '+path1);
+			if (path1 && path2 && path2.firstSegment && path2.firstSegment.point 
+				    && path1.hitTest(path2.firstSegment.point)) {
 				return true;
 			}
-			// TODO clean up these no-point paths
+			// TODO clean up these no point paths
 			return false;
-		};
+		}
 
 		tool.isMergeable = function(newPath, existingPath) {
 			return existingPath !== cc  // don't merge with the mouse preview
@@ -153,6 +161,7 @@ pg.tools.broadbrush = function() {
 			
 			finalPath = new Path();
 			finalPath = pg.stylebar.applyActiveToolbarStyle(finalPath);
+			finalPath.strokeColor = null;
 			finalPath.add(event.point);
 			lastPoint = secondLastPoint = event.point;
 		};
@@ -165,7 +174,7 @@ pg.tools.broadbrush = function() {
 			var step = (event.delta).normalize(options.brushWidth/2);
 
 			// Move the first point out away from the drag so that the end of the path is rounded
-			if (finalPath.segments.length === 1) {
+			if (finalPath.segments && finalPath.segments.length === 1) {
 				var removedPoint = finalPath.removeSegment(0).point;
 				// Add handles to round the end caps
 				var handleVec = step.clone();
@@ -270,6 +279,7 @@ pg.tools.broadbrush = function() {
 
 			var path = new Path();
 			path = pg.stylebar.applyActiveToolbarStyle(path);
+			path.strokeColor = null;
 			// Add handles to round the end caps
 			path.add(new Segment(lastPoint - step, -handleVec, handleVec));
 			step.angle += 90;

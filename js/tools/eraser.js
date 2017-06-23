@@ -159,7 +159,6 @@ pg.tools.eraser = function() {
 		tool.touches = function(path1, path2) {
 			// Two shapes are touching if their paths intersect
 			if (path1.intersects(path2)) {
-				console.log('intersects shape: '+path1);
 				return true;
 			}
 			return tool.enclosesOrExcloses(path1, path2);
@@ -170,7 +169,6 @@ pg.tools.eraser = function() {
 			// Two shapes are also touching if one is completely inside the other
 			if (path1 && path1.firstSegment && path1.firstSegment.point && path2 && path2.firstSegment && path2.firstSegment.point 
 				    && (path1.hitTest(path2.firstSegment.point) || path2.hitTest(path1.firstSegment.point))) {
-				console.log('hits shape: '+path1);
 				return true;
 			}
 			return false;
