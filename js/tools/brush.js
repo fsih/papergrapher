@@ -112,6 +112,8 @@ pg.tools.broadbrush = function() {
 					// Merge same fill color
 					var newPath = finalPath.unite(paths[i]);
 					newPath.insertAbove(paths[i]); // Don't drag the existing shape forward
+					newPath.strokeColor = paths[i].strokeColor;
+					newPath.strokeWidth = paths[i].strokeWidth;
 					finalPath.remove();
 					paths[i].remove();
 					paths.splice(i, 1);
