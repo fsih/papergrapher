@@ -3,7 +3,7 @@
 }
 
 body {
-	background: aliceblue
+	background: papayawhip;
 }
 
 #paperCanvas {
@@ -11,7 +11,7 @@ body {
 	height: 800px;
 	top: 30px;
 	left: 76px;
-    border: 1px solid aliceblue;
+    border: 1px solid papayawhip;
     border-radius: 2px;
 	background-color: #fff
 }

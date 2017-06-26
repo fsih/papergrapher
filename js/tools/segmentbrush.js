@@ -106,8 +106,6 @@ pg.tools.segmentbrush = function() {
 			// reset
 			tool.fixedDistance = 1;
 
-			pg.undo.snapshot('broadbrush');
-
 			// Get all Path items
 			var items = paper.project.getItems({
 			    'class': Path
@@ -139,7 +137,7 @@ pg.tools.segmentbrush = function() {
 				    items[i].remove();
 				}
 			}
-			pg.undo.snapshot('broadbrush');
+			pg.undo.snapshot('segmentbrush');
 		};
 		
 		// setup floating tool options panel in the editor
