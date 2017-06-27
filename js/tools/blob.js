@@ -2,6 +2,7 @@ pg.blob = function() {
 	var tool;
 	var options;
 	var cursorPreview;
+	var brushSize;
 
 	var brush;
 	var BROAD = "broadbrush";
@@ -18,9 +19,10 @@ pg.blob = function() {
 		var THRESHOLD = 20;
 		
 		cursorPreview = new Path.Circle({
-			    center: [-10000, -10000],
-			    radius: options.brushWidth/2,
-			});
+		    center: [-10000, -10000],
+		    radius: options.brushWidth/2,
+		});
+		brushSize = options.brushWidth;
 
 		tool.stylePath = function(path) {
 			if (isEraser) {
@@ -42,8 +44,13 @@ pg.blob = function() {
 		pg.broadbrushhelper(tool, options);
 		pg.segmentbrushhelper(tool, options);
 		tool.onMouseMove = function(event) {
-			if (options.brushWidth/2 !== cursorPreview.radius) {
-				cursorPreview.radius = options.brushWidth/2;
+			if (brushSize !== options.brushWidth) {
+				cursorPreview.remove();
+				cursorPreview = new Path.Circle({
+				    center: event.point,
+				    radius: options.brushWidth/2,
+				});
+				brushSize = options.brushWidth;
 			}
 			tool.stylePath(cursorPreview);
 			cursorPreview.bringToFront();
@@ -160,7 +167,6 @@ pg.blob = function() {
 			});
 			// Eraser didn't hit anything selected, so assume they meant to erase from all instead of from subset and deselect
 			// the selection
-			debugger;
 			if (items.length === 0) {
 				pg.selection.clearSelection();
 				items = paper.project.getItems({
