@@ -25,6 +25,10 @@ pg.blob = function() {
 		tool.stylePath = function(path) {
 			if (isEraser) {
 				path.fillColor = 'white';
+				if (path === cursorPreview) {
+					path.strokeColor = 'cornflowerblue';
+					path.strokeWidth = 1;
+				}
 			} else {
 				// TODO keep a separate active toolbar style for brush vs pen?
 				path = pg.stylebar.applyActiveToolbarStyle(path);
@@ -32,10 +36,7 @@ pg.blob = function() {
 		};
 
 		tool.stylePath(cursorPreview);
-		if (isEraser) {
-			cursorPreview.strokeColor = 'cornflowerblue';
-			cursorPreview.strokeWidth = 1;
-		}
+
 		tool.fixedDistance = 1;
 
 		pg.broadbrushhelper(tool, options);
@@ -44,6 +45,7 @@ pg.blob = function() {
 			if (options.brushWidth/2 !== cursorPreview.radius) {
 				cursorPreview.radius = options.brushWidth/2;
 			}
+			tool.stylePath(cursorPreview);
 			cursorPreview.bringToFront();
 			cursorPreview.position = event.point;
 		};
@@ -63,8 +65,10 @@ pg.blob = function() {
 		};
 
 		tool.onMouseDrag = function(event) {
+			cursorPreview.bringToFront();
+			cursorPreview.position = event.point;
+
 			if(event.event.button > 0) return;  // only first mouse button
-			
 			if (brush === BROAD) {
 				this.onBroadMouseDrag(event);
 			} else if (brush === SEGMENT) {
@@ -72,8 +76,6 @@ pg.blob = function() {
 			} else {
 				console.warn("Brush type does not exist: ", brush);
 			}
-			cursorPreview.bringToFront();
-			cursorPreview.position = event.point;
 		};
 
 		tool.onMouseUp = function(event) {
@@ -195,6 +197,7 @@ pg.blob = function() {
 					    	var ccw = ccwChildren[k];
 					    	if (tool.firstEnclosesSecond(ccw, cw) || tool.firstEnclosesSecond(cw, ccw)) {
 					    		var temp = newCw.subtract(ccw);
+					    		temp.insertAbove(newCw);
 					    		newCw.remove();
 					    		newCw = temp;
 					    		ccw.remove();
