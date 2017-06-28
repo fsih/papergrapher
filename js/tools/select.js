@@ -179,6 +179,21 @@ pg.tools.select = function() {
 			label: 'Delete',
 			click: 'pg.selection.deleteSelection'
 		},
+		groupSelection: {
+			type: 'button',
+			label: 'Group',
+			click: 'pg.group.groupSelection'
+		},
+		ungroupSelection: {
+			type: 'button',
+			label: 'Ungroup',
+			click: 'pg.group.ungroupSelection'
+		},
+		booleanUnite: {
+			type: 'button',
+			label: 'Merge',
+			click: 'pg.boolean.booleanUnite'
+		},
 		bringToFront: {
 			type: 'button',
 			label: 'Bring to front',
@@ -195,6 +210,7 @@ pg.tools.select = function() {
 		setSelectionBounds();
 		preProcessSelection();
 		tool = new Tool();
+		tolerance = 6;
 
 		var hitOptions = {
 			segments: true,
@@ -202,7 +218,7 @@ pg.tools.select = function() {
 			curves: true,
 			fill: true,
 			guide: false,
-			tolerance: 8 / paper.view.zoom
+			tolerance: tolerance / paper.view.zoom
 		};
 
 		var mode = 'none';
@@ -224,11 +240,29 @@ pg.tools.select = function() {
 			if(event.event.button > 0) return;  // only first mouse button
 			pg.hover.clearHoveredItem();
 			
-			var hitResult = paper.project.hitTest(event.point, hitOptions);
-			if (hitResult) {
-				
-				if(hitResult.item.data && hitResult.item.data.isScaleHandle) {
-					mode = 'scale';
+			hitOptions.tolerance = tolerance / paper.view.zoom;
+			var hitResults = paper.project.hitTestAll(event.point, hitOptions);
+			// Prefer rotate to trigger over scale, since their regions somewhat overlap
+			if (hitResults && hitResults.length > 0) {
+				var hitResult = hitResults[0];
+				for (var i = 0; i < hitResults.length; i++) {
+					if (hitResults[i].item.data && hitResults[i].item.data.isRotHandle) {
+						hitResult = hitResults[i];
+						mode = 'rotate';
+						break;
+					} else if (hitResults[i].item.data && hitResults[i].item.data.isScaleHandle) {
+						hitResult = hitResults[i];
+						mode = 'scale';
+					}
+				}
+				if (mode === 'rotate') {
+					rotGroupPivot = boundsPath.bounds.center;
+					rotItems = pg.selection.getSelectedItems();
+					
+					jQuery.each(rotItems, function(i, item) {
+						prevRot[i] = (event.point - rotGroupPivot).angle;
+					});
+				} else if (mode === 'scale') {
 					var index = hitResult.item.data.index;					
 					pivot = boundsPath.bounds[getOpposingRectCornerNameByIndex(index)].clone();
 					origPivot = boundsPath.bounds[getOpposingRectCornerNameByIndex(index)].clone();
@@ -236,16 +270,6 @@ pg.tools.select = function() {
 					origSize = corner.subtract(pivot);
 					origCenter = boundsPath.bounds.center;
 					scaleItems = pg.selection.getSelectedItems();
-					
-				} else if(hitResult.item.data && hitResult.item.data.isRotHandle) {
-					mode = 'rotate';
-					rotGroupPivot = boundsPath.bounds.center;
-					rotItems = pg.selection.getSelectedItems();
-					
-					jQuery.each(rotItems, function(i, item) {
-						prevRot[i] = (event.point - rotGroupPivot).angle;
-					});
-										
 				} else {
 					// deselect all by default if the shift key isn't pressed
 					// also needs some special love for compound paths and groups,
@@ -278,7 +302,6 @@ pg.tools.select = function() {
 				}
 				// while transforming object, never show the bounds stuff
 				removeBoundsPath();
-
 			} else {
 				if (!event.modifiers.shift) {
 					removeBoundsPath();
@@ -414,19 +437,23 @@ pg.tools.select = function() {
 				pg.undo.snapshot('moveSelection');
 				
 			} else if(mode == 'scale') {
-				itemGroup.applyMatrix = true;
-				
-				// mark text items as scaled (for later use on font size calc)
-				for(var i=0; i<itemGroup.children.length; i++) {
-					var child = itemGroup.children[i];
-					if(child.data.isPGTextItem) {
-						child.data.wasScaled = true;
+				if (itemGroup) {
+					itemGroup.applyMatrix = true;
+					
+					// mark text items as scaled (for later use on font size calc)
+					for(var i=0; i<itemGroup.children.length; i++) {
+						var child = itemGroup.children[i];
+						if(child.data.isPGTextItem) {
+							child.data.wasScaled = true;
+						}
 					}
+					
+					if (itemGroup.layer) {
+						itemGroup.layer.addChildren(itemGroup.children);
+					}
+					itemGroup.remove();
+					pg.undo.snapshot('scaleSelection');
 				}
-				
-				itemGroup.layer.addChildren(itemGroup.children);
-				itemGroup.remove();
-				pg.undo.snapshot('scaleSelection');
 				
 			} else if(mode == 'rotate') {
 				jQuery.each(rotItems, function(i, item) {
@@ -534,7 +561,7 @@ pg.tools.select = function() {
 			}
 			
 			if(index == 7) {
-				var offset = new Point(0, 10/paper.view.zoom);
+				var offset = new Point(0, 20/paper.view.zoom);
 				boundsRotHandles[index] =
 				new paper.Path.Circle({
 					center: segment.point + offset,

@@ -16,7 +16,7 @@ pg.blob = function() {
 		// brush size >= threshold use segment brush, else use broadbrush
 		// Segment brush has performance issues at low threshold, but broad brush has weird corners
 		// which are more obvious the bigger it is
-		var THRESHOLD = 20;
+		var THRESHOLD = 10;
 		
 		cursorPreview = new Path.Circle({
 		    center: [-10000, -10000],

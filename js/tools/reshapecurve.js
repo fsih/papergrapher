@@ -289,7 +289,6 @@ pg.tools.reshapecurve = function() {
 		
 		tool.onMouseDrag = function(event) {
 			if(event.event.button > 0) return; // only first mouse button
-			
 			if(doRectSelection) {
 				selectionRect = pg.guides.rectSelect(event);
 				// Remove this rect on the next drag and up event
@@ -299,7 +298,7 @@ pg.tools.reshapecurve = function() {
 				doRectSelection = false;
 				selectionDragged = true;
 				
-				var selectedItems = pg.selection.getSelectedItems();
+				var selectedItems = paper.project.selectedItems; //pg.selection.getSelectedItems();
 				var dragVector = (event.point - event.downPoint);
 				
 				for(var i=0; i < selectedItems.length; i++) {

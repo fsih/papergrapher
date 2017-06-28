@@ -1,8 +1,8 @@
 pg.boolean = function() {
 	
 	var booleanUnite = function(items, replaceWithResult) {
-		if (mode === "ORIGINAL") {
-			items = items || pg.selection.getSelectedItems();
+		if (!items) {
+			items = pg.selection.getSelectedItems();
 		}
 		replaceWithResult = replaceWithResult || true;
 		
