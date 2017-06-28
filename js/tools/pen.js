@@ -34,6 +34,11 @@ pg.tools.pen = function() {
 		
 		tool = new Tool();
 		
+		// Make sure a stroke color is set on the pen
+		if(!pg.stylebar.getStrokeColor()) {
+			pg.stylebar.setStrokeColor(pg.stylebar.getFillColor());
+			pg.stylebar.setFillColor(null);
+		}
 
 		tool.onMouseDown = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button

@@ -129,8 +129,7 @@ pg.blob = function() {
 					continue;
 				}
 				if (!paths[i].getFillColor()) {
-					console.warn('No fill color: ');
-					console.warn(paths[i]);
+					// Ignore for merge. Paths without fill need to be in paths though, since they can visibly change if z order changes
 				} else if (tool.colorMatch(paths[i], lastPath)) {
 					// Make sure the new shape isn't overlapped by anything that would visibly change if we change its z order
 					for (var j = mergedPathIndex; j > i; j--) {

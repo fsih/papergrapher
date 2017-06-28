@@ -11,14 +11,21 @@ pg.tools.registerTool({
 
 pg.tools.line = function() {
 	var tool;
-	var options = {};
+	var options = {
+		snapDistance: 6
+	};
 	
 	var activateTool = function() {
 		tool = new Tool();
 		
 		var path;
 		var hitResult = null;
-		var tolerance = 6;
+
+		// Make sure a stroke color is set on the line tool
+		if(!pg.stylebar.getStrokeColor()) {
+			pg.stylebar.setStrokeColor(pg.stylebar.getFillColor());
+			pg.stylebar.setFillColor(null);
+		}
 
 		tool.onMouseDown = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
@@ -57,7 +64,8 @@ pg.tools.line = function() {
 				hitResult = null;
 			}
 
-			if (path && path.firstSegment.point.getDistance(event.point, true) < tool.tolerance() * tool.tolerance()) {
+			if (path && !path.closed 
+				    && path.firstSegment.point.getDistance(event.point, true) < tool.tolerance() * tool.tolerance()) {
 				hitResult = {
 					path: path,
 					segment: path.firstSegment,
@@ -182,15 +190,23 @@ pg.tools.line = function() {
 		};
 
 		tool.tolerance = function() {
-			return tolerance / paper.view.zoom;
+			return options.snapDistance / paper.view.zoom;
 		};
 		
 		tool.activate();
 	};
+
+	var deactivateTool = function() {
+		if (path) {
+			path.setSelected(false);
+			path = null;
+		}
+	}
 	
 	return {
 		options: options,
-		activateTool : activateTool
+		activateTool : activateTool,
+		deactivateTool : deactivateTool
 	};
 	
 };

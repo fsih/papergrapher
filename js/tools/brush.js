@@ -24,6 +24,12 @@ pg.tools.broadbrush = function() {
 		var tool = new Tool();
 		blob.activateTool(false /* isEraser */, tool, options);
 
+		// Make sure a fill color is set on the brush
+		if(!pg.stylebar.getFillColor()) {
+			pg.stylebar.setFillColor(pg.stylebar.getStrokeColor());
+			pg.stylebar.setStrokeColor(null);
+		}
+
 		// setup floating tool options panel in the editor
 		pg.toolOptionPanel.setup(options, components, function() {});
 		
