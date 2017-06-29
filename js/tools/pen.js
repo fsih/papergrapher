@@ -11,7 +11,7 @@ pg.tools.pen = function() {
 	
 	var options = {
 		closePath: 'near start',
-		smoothPath : 2.5
+		smoothPath : 1
 	};
 	
 	var components = {
@@ -20,10 +20,6 @@ pg.tools.pen = function() {
 			label: 'Close path',
 			options: [ 'near start', 'always', 'never' ]
 		},
-		smoothPath: {
-			type: 'float',
-			label: 'Smooth path'
-		}
 	};
 
 	var activateTool = function() {

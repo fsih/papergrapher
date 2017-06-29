@@ -174,11 +174,30 @@ pg.blob = function() {
 				    }
 				});
 			}
+			
 			for (var i = items.length - 1; i >= 0; i--) {
 				// Assume that result of erase operation returns clockwise paths for positive shapes
 				var clockwiseChildren = [];
 				var ccwChildren = [];
 				var newPath = items[i].subtract(lastPath);
+
+				// if (items[i] instanceof PathItem && !items[i].closed) {
+				// 	var intersections = items[i].getIntersections(lastPath);
+				// 	// keep first and last segments
+				// 	if (intersections.length === 0) {
+				// 		continue;
+				// 	}
+				// 	var clone;
+				// 	if (intersections.length > 1) {
+				// 		clone = items[i].clone();
+				// 		clone.split(intersections[intersections.length - 1]);
+				// 		//clone.remove();
+				// 	}
+				// 	items[i].split(intersections[0]);
+				// }
+
+				// Divide topologically separate shapes into their own compound paths, instead of
+				// everything being stuck together
 				if (newPath.children) {
 				    for (var j = newPath.children.length - 1; j >= 0; j--) {
 					    var child = newPath.children[j];
