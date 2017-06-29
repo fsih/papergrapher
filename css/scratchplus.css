@@ -18,6 +18,7 @@ body {
 
 .toolbar {
 	height:800px;
+	padding-top: 30px;
 }
 
 .appNav .topMenu>li.empty {
