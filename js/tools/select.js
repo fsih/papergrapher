@@ -231,6 +231,7 @@ pg.tools.select = function() {
 		var origSize;
 		var origCenter;
 		var scaleItems;
+		var scaleItemsInsertBelow;
 		
 		var rotItems = [];
 		var rotGroupPivot;
@@ -328,7 +329,27 @@ pg.tools.select = function() {
 				selectionRect.removeOnDrag();
 
 			} else if(mode == 'scale') {
+				// get index of scale items
+				var items = paper.project.getItems({
+					'match': function(item) {
+						if (item instanceof Layer) {
+							return false;
+						}
+						for (var i = 0; i < scaleItems.length; i++) {
+							if (!scaleItems[i].isBelow(item)) {
+								return false;
+							}
+						}
+						return true;
+					}
+				});
+				if (items.length > 0) {
+					// Lowest item above all scale items in z index
+					scaleItemsInsertBelow = items[0];
+				}
+
 				itemGroup = new paper.Group(scaleItems);
+				itemGroup.insertBelow(scaleItemsInsertBelow);
 				itemGroup.addChild(boundsPath);
 				itemGroup.data.isHelperItem = true;
 				itemGroup.strokeScaling = false;
@@ -447,9 +468,15 @@ pg.tools.select = function() {
 							child.data.wasScaled = true;
 						}
 					}
-					
-					if (itemGroup.layer) {
-						itemGroup.layer.addChildren(itemGroup.children);
+
+					if (scaleItemsInsertBelow) {
+						// No increment step because itemGroup.children is getting depleted
+						for (var i = 0; i < itemGroup.children.length;) {
+							itemGroup.children[i].insertBelow(scaleItemsInsertBelow);
+						}
+						scaleItemsInsertBelow = null;
+					} else if (itemGroup.layer) {
+					 	itemGroup.layer.addChildren(itemGroup.children);
 					}
 					itemGroup.remove();
 					pg.undo.snapshot('scaleSelection');
