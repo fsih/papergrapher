@@ -177,9 +177,11 @@ pg.blob = function() {
 			}
 			
 			for (var i = items.length - 1; i >= 0; i--) {
-				var newPath = items[i].subtract(lastPath);
+				// Erase
+				newPath = items[i].subtract(lastPath);
 
 				// Gather path segments
+				var subpaths = [];
 				if (items[i] instanceof PathItem && !items[i].closed) {
 					var firstSeg = items[i].clone();
 					var intersections = firstSeg.getIntersections(lastPath);
@@ -187,20 +189,14 @@ pg.blob = function() {
 					if (intersections.length === 0) {
 						continue;
 					}
-					var subpaths = [];
 					for (var j = intersections.length - 1; j >= 0; j--) {
-						console.log(firstSeg.segments.toString());
-						console.log(intersections[j].curveOffset);
 						subpaths.push(firstSeg.splitAt(intersections[j]));
-						console.log(firstSeg.segments.toString());
 					}
 					subpaths.push(firstSeg);
-					console.log(subpaths);
 				}
 
 				// Remove the ones that are within the eraser stroke boundary, or are already part of new path.
 				// This way subpaths only remain if they didn't get turned into a shape by subtract.
-				debugger;
 				for (var k = subpaths.length - 1; k >= 0; k--) {
 					var segMidpoint = subpaths[k].getLocationAt(subpaths[k].length/2).point;
 					if (lastPath.contains(segMidpoint) || newPath.contains(segMidpoint)) {
