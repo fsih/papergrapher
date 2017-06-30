@@ -8,6 +8,8 @@ pg.selection = function() {
 			var activeToolID = activeTool.options.id;
 			if(activeToolID == 'detailselect') {
 				return 'Segment';
+			} else if (activeToolID == 'reshapecurve') {
+				return 'ReshapePoints';
 			} else {
 				return 'Item';
 			}
@@ -103,10 +105,16 @@ pg.selection = function() {
 	
 	
 	var deleteSelection = function() {
+		debugger;
 		var selectionMode = getSelectionMode();
 		
 		if(selectionMode == 'Segment') {
 			deleteSegmentSelection();
+		} else if(selectionMode == 'ReshapePoints') {
+			// If there are points selected remove them. If not delete the item selected.
+			if (!removeSelectedSegments()) {
+				deleteItemSelection();
+			}
 		} else {
 			deleteItemSelection();
 		}
@@ -124,8 +132,7 @@ pg.selection = function() {
 		paper.project.view.update();
 		pg.undo.snapshot('deleteItemSelection');
 	};
-	
-	
+
 	var deleteSegmentSelection = function() {
 		
 		var items = getSelectedItems();
@@ -402,10 +409,13 @@ pg.selection = function() {
 			}
 		}
 		
+		var removedSegments = false;
 		for(var i=0; i<segmentsToRemove.length; i++) {
 			var seg = segmentsToRemove[i];
 			seg.remove();
+			removedSegments = true;
 		}
+		return removedSegments;
 	};
 	
 	
