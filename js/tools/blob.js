@@ -72,9 +72,6 @@ pg.blob = function() {
 		};
 
 		tool.onMouseDrag = function(event) {
-			cursorPreview.bringToFront();
-			cursorPreview.position = event.point;
-
 			if(event.event.button > 0) return;  // only first mouse button
 			if (brush === BROAD) {
 				this.onBroadMouseDrag(event);
@@ -83,6 +80,9 @@ pg.blob = function() {
 			} else {
 				console.warn("Brush type does not exist: ", brush);
 			}
+
+			cursorPreview.bringToFront();
+			cursorPreview.position = event.point;
 		};
 
 		tool.onMouseUp = function(event) {
@@ -102,6 +102,7 @@ pg.blob = function() {
 			} else {
 				tool.mergeEraser(lastPath);
 			}
+
 			cursorPreview.bringToFront();
 			cursorPreview.position = event.point;
 
@@ -176,28 +177,43 @@ pg.blob = function() {
 			}
 			
 			for (var i = items.length - 1; i >= 0; i--) {
+				var newPath = items[i].subtract(lastPath);
+
+				// Gather path segments
+				if (items[i] instanceof PathItem && !items[i].closed) {
+					var firstSeg = items[i].clone();
+					var intersections = firstSeg.getIntersections(lastPath);
+					// keep first and last segments
+					if (intersections.length === 0) {
+						continue;
+					}
+					var subpaths = [];
+					for (var j = intersections.length - 1; j >= 0; j--) {
+						console.log(firstSeg.segments.toString());
+						console.log(intersections[j].curveOffset);
+						subpaths.push(firstSeg.splitAt(intersections[j]));
+						console.log(firstSeg.segments.toString());
+					}
+					subpaths.push(firstSeg);
+					console.log(subpaths);
+				}
+
+				// Remove the ones that are within the eraser stroke boundary, or are already part of new path.
+				// This way subpaths only remain if they didn't get turned into a shape by subtract.
+				debugger;
+				for (var k = subpaths.length - 1; k >= 0; k--) {
+					var segMidpoint = subpaths[k].getLocationAt(subpaths[k].length/2).point;
+					if (lastPath.contains(segMidpoint) || newPath.contains(segMidpoint)) {
+						subpaths[k].remove();
+						subpaths.splice(k, 1);
+					}
+				}
+
+				// Divide topologically separate shapes into their own compound paths, instead of
+				// everything being stuck together.
 				// Assume that result of erase operation returns clockwise paths for positive shapes
 				var clockwiseChildren = [];
 				var ccwChildren = [];
-				var newPath = items[i].subtract(lastPath);
-
-				// if (items[i] instanceof PathItem && !items[i].closed) {
-				// 	var intersections = items[i].getIntersections(lastPath);
-				// 	// keep first and last segments
-				// 	if (intersections.length === 0) {
-				// 		continue;
-				// 	}
-				// 	var clone;
-				// 	if (intersections.length > 1) {
-				// 		clone = items[i].clone();
-				// 		clone.split(intersections[intersections.length - 1]);
-				// 		//clone.remove();
-				// 	}
-				// 	items[i].split(intersections[0]);
-				// }
-
-				// Divide topologically separate shapes into their own compound paths, instead of
-				// everything being stuck together
 				if (newPath.children) {
 				    for (var j = newPath.children.length - 1; j >= 0; j--) {
 					    var child = newPath.children[j];
@@ -238,9 +254,11 @@ pg.blob = function() {
 		};
 
 		tool.colorMatch = function(existingPath, addedPath) {
-			// TODO is it possible to have transparent fill colors detect as touching?
+			// Note: transparent fill colors do notdetect as touching
 			return existingPath.getFillColor().equals(addedPath.getFillColor()) 
-			        && (addedPath.getStrokeColor() === null || addedPath.getStrokeColor().equals(existingPath.getStrokeColor()))
+			        && (addedPath.getStrokeColor() === existingPath.getStrokeColor() // both null 
+			        	|| (addedPath.getStrokeColor() && addedPath.getStrokeColor().equals(existingPath.getStrokeColor()))) // both non-null and equal
+			        && addedPath.getStrokeWidth() === existingPath.getStrokeWidth()
 			        && tool.touches(existingPath, addedPath);
 		};
 
