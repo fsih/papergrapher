@@ -8920,13 +8920,15 @@ new function() {
 				drawHandle(2);
 			if (selection & 4)
 				drawHandle(4);
-			ctx.fillRect(pX - half, pY - half, size, size);
+			ctx.beginPath();
+			ctx.arc(pX, pY, half, 0, Math.PI * 2, true);
+			ctx.stroke();
+			var fillStyle = ctx.fillStyle;
 			if (!(selection & 1)) {
-				var fillStyle = ctx.fillStyle;
-				ctx.fillStyle = '#ffffff';
-				ctx.fillRect(pX - half + 1, pY - half + 1, size - 2, size - 2);
-				ctx.fillStyle = fillStyle;
+				ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
 			}
+			ctx.fill();
+			ctx.fillStyle = fillStyle;
 		}
 	}
 

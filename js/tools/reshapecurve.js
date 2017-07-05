@@ -83,7 +83,7 @@ pg.tools.reshapecurve = function() {
 
 	var activateTool = function() {		
 		tool = new Tool();
-		paper.settings.handleSize = 6;
+		paper.settings.handleSize = 8;
 				
 		var hitOptions = {
 			segments: true,
@@ -174,6 +174,7 @@ pg.tools.reshapecurve = function() {
 			} else if (hitResult.type === 'segment') {
 				hitType = 'point';
  				
+ 				// Remove point
  				if (doubleClicked) {
  					var index = hitResult.segment.index
 					hitResult.item.removeSegment(index);
