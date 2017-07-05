@@ -206,7 +206,7 @@ pg.tools.select = function() {
 		}
 	};
 
-	var activateTool = function() {		
+	var activateTool = function() {
 		setSelectionBounds();
 		preProcessSelection();
 		tool = new Tool();
@@ -271,7 +271,9 @@ pg.tools.select = function() {
 					origSize = corner.subtract(pivot);
 					origCenter = boundsPath.bounds.center;
 					scaleItems = pg.selection.getSelectedItems();
-				} else {
+				} 
+				// TODO: add anchor point move
+				else { // Move mode
 					// deselect all by default if the shift key isn't pressed
 					// also needs some special love for compound paths and groups,
 					// as their children are not marked as "selected"

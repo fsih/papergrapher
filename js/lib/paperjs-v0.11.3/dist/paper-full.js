@@ -8889,6 +8889,9 @@ var Path = PathItem.extend({
 new function() {
 
 	function drawHandles(ctx, segments, matrix, size) {
+		if (size === 0) {
+			return;
+		}
 		var half = size / 2,
 			coords = new Array(6),
 			pX, pY;

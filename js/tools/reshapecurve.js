@@ -83,6 +83,7 @@ pg.tools.reshapecurve = function() {
 
 	var activateTool = function() {		
 		tool = new Tool();
+		paper.settings.handleSize = 6;
 				
 		var hitOptions = {
 			segments: true,
@@ -91,7 +92,7 @@ pg.tools.reshapecurve = function() {
 			handles: true,
 			fill: true,
 			guide: false,
-			tolerance: 3 / paper.view.zoom
+			tolerance: 8 / paper.view.zoom
 		};
 		
 		var doRectSelection = false;
@@ -120,13 +121,22 @@ pg.tools.reshapecurve = function() {
 			
 			hitType = null;
 			pg.hover.clearHoveredItem();
-			var hitResult = paper.project.hitTest(event.point, hitOptions);
-			if (!hitResult) {
+			var hitResults = paper.project.hitTestAll(event.point, hitOptions);
+			if (hitResults.length === 0) {
 				if (!event.modifiers.shift) {
 					pg.selection.clearSelection();
 				}
 				doRectSelection = true;
 				return;
+			}
+
+			var hitResult = hitResults[0];
+			for (var i = 0; i < hitResults.length; i++) {
+				// Prefer hits on segments to other types of hits, to make sure handles are movable.
+				if (hitResults[i].type === 'segment') {
+					hitResult = hitResults[i];
+					break;
+				}
 			}
 			
 			// dont allow detail-selection of PGTextItem
@@ -448,6 +458,7 @@ pg.tools.reshapecurve = function() {
 
 	
 	var deactivateTool = function() {
+		paper.settings.handleSize = 0;
 		pg.hover.clearHoveredItem();
 		pg.menu.clearToolEntries();
 	};

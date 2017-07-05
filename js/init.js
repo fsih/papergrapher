@@ -4,6 +4,9 @@ var pg = function() {
 	
 	var init = function() {
 		paper.setup('paperCanvas');
+
+		// Don't show handles by default
+		paper.settings.handleSize = 0;
 		
 		pg.settings.setup();
 		

@@ -1,7 +1,6 @@
 // functions related to selecting stuff
 
 pg.selection = function() {
-	
 	var getSelectionMode = function() {
 		var activeTool = pg.toolbar.getActiveTool();
 		if(activeTool) {
@@ -105,7 +104,6 @@ pg.selection = function() {
 	
 	
 	var deleteSelection = function() {
-		debugger;
 		var selectionMode = getSelectionMode();
 		
 		if(selectionMode == 'Segment') {
