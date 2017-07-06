@@ -44,6 +44,8 @@ pg.tools.line = function() {
 				}
 				path.lastSegment.setSelected(true);
 				path.add(hitResult.segment); // Add second point, which is what will move when dragged
+				path.lastSegment.handleOut = undefined;
+				path.lastSegment.handleIn = undefined;
 			}
 
 			// If not near other path, start a new path
