@@ -38,7 +38,7 @@ pg.segmentbrushhelper = function(tool, options) {
 		path.closed = true;
 		// The unite function on curved paths does not always work (sometimes deletes half the path)
 		// so we have to flatten.
-		path.flatten(3);
+		path.flatten(options.brushWidth/5);
 		
 		lastPoint = event.point;
 		var newPath = finalPath.unite(path);
@@ -52,7 +52,7 @@ pg.segmentbrushhelper = function(tool, options) {
 		// add back smoothing, maybe a custom implementation that only applies to a subset of the line?
 
 		// Smooth the path.
-		//finalPath.simplify(2);
+		finalPath.simplify(2);
 		//console.log(finalPath.segments);
 		return finalPath;
 	};

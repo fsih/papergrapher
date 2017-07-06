@@ -9,7 +9,7 @@ pg.tools.eraser = function() {
 	var blob =  new pg.blob();
 
 	var options = {
-		brushWidth: 60
+		brushWidth: 20
 	};
 	
 	var components = {

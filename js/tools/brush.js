@@ -7,7 +7,7 @@ pg.tools.broadbrush = function() {
 	var blob =  new pg.blob();
 
 	var options = {
-		brushWidth: 60
+		brushWidth: 5
 	};
 	
 	var components = {

@@ -37,6 +37,10 @@ pg.tools.eyedropper = function() {
 					
 				} else {
 					pg.stylebar.updateFromItem(hitResult.item);
+
+					pg.stylebar.applyFillColorToSelection(pg.stylebar.getFillColor());
+					pg.stylebar.applyStrokeColorToSelection(pg.stylebar.getStrokeColor());
+					pg.stylebar.applyStrokeWidthToSelection(jQuery('#strokeInput').val());
 				}
 			}
 		};

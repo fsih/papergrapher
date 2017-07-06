@@ -47,7 +47,7 @@ pg.tools.reshapecurve = function() {
 		},
 		removeSegments: {
 			type: 'button',
-			label: 'Remove segments',
+			label: 'Remove points',
 			click: 'pg.selection.removeSelectedSegments'
 		},
 		splitPath: {
@@ -71,7 +71,7 @@ pg.tools.reshapecurve = function() {
 		},
 		removeSegments: {
 			type: 'button',
-			label: 'Remove segments',
+			label: 'Remove points',
 			click: 'pg.selection.removeSelectedSegments'
 		},
 		splitPath: {
@@ -315,6 +315,7 @@ pg.tools.reshapecurve = function() {
 				for(var i=0; i < selectedItems.length; i++) {
 					var item = selectedItems[i];
 
+					// move
 					if(hitType === 'fill' || !item.segments) {
 						
 						// if the item has a compound path as a parent, don't move its
@@ -336,7 +337,7 @@ pg.tools.reshapecurve = function() {
 						} else {
 							item.position += event.delta;
 						}
-
+					// reshape
 					} else {
 						for(var j=0; j < item.segments.length; j++) {
 							var seg = item.segments[j];
@@ -346,6 +347,7 @@ pg.tools.reshapecurve = function() {
 								seg.origPoint = seg.point.clone();
 							}
 
+							var pathChanged = false;
 							if( seg.selected && (
 								hitType === 'point' || 
 								hitType === 'stroke' || 
@@ -358,7 +360,7 @@ pg.tools.reshapecurve = function() {
 								} else {
 									seg.point += event.delta;
 								}
-
+								pathChanged = true;
 							} else if(seg.handleOut.selected && 
 								hitType === 'handle-out'){
 								//if option is pressed or handles have been split, 
@@ -372,7 +374,7 @@ pg.tools.reshapecurve = function() {
 									seg.handleOut += event.delta;
 									seg.handleIn = -seg.handleOut * seg.handleIn.length/oldLength;
 								}
-
+								pathChanged = true;
 							} else if(seg.handleIn.selected && 
 								hitType === 'handle-in') {
 
@@ -387,9 +389,61 @@ pg.tools.reshapecurve = function() {
 									seg.handleIn += event.delta;
 									seg.handleOut = -seg.handleIn * seg.handleOut.length/oldLength;
 								}	
+								pathChanged = true;
 							}
+
+							/*if (pathChanged) {
+ 								var startIndex = j-1;
+								var endIndex = j+1;
+								var endInHandle, startOutHandle, startInHandle; // Have to do start in handle because there's weird asymmetry in smooth()
+								console.log('j '+j);
+								if (item.closed) {
+									startIndex = (startIndex + item.segments.length) % item.segments.length; // To make sure the mod is positive
+									endIndex = endIndex % item.segments.length;
+
+									// If handle is smooth, make this one movable too
+									if (item.segments[startIndex].handleOut.isColinear(item.segments[startIndex].handleIn)) {
+										startIndex = (startIndex - 1 + item.segments.length) % item.segments.length;
+									}
+									if (item.segments[endIndex].handleOut.isColinear(item.segments[endIndex].handleIn)) {
+										endIndex = (endIndex + 1) % item.segments.length;
+									}
+
+									if (startIndex === endIndex) {
+										item.smooth();
+									} else {
+										item.smooth({from: startIndex, to: endIndex});
+										endInHandle = item.segments[endIndex].handleIn.clone();
+										startOutHandle = item.segments[startIndex].handleOut.clone();
+										startInHandle = item.segments[startIndex].handleIn.clone();
+									}
+								} else {
+									endIndex = endIndex >= item.segments.length ? undefined : endIndex;
+									startIndex = startIndex < 0 ? undefined : startIndex;
+									// If handle is smooth, make this one movable too
+									if (startIndex !== undefined && !item.segments[startIndex].handleIn.isZero() && !item.segments[startIndex].handleOut.isZero() && item.segments[startIndex].handleOut.isColinear(item.segments[startIndex].handleIn)) {
+										startIndex = startIndex - 1 < 0 ? undefined : startIndex - 1;
+									}
+									if (endIndex !== undefined && !item.segments[endIndex].handleIn.isZero() && !item.segments[endIndex].handleOut.isZero() && item.segments[endIndex].handleOut.isColinear(item.segments[endIndex].handleIn)) {
+										endIndex = endIndex + 1 >= item.segments.length ? undefined : endIndex + 1;
+									}
+
+									endInHandle = endIndex === undefined ? undefined : item.segments[endIndex].handleIn.clone();
+									startOutHandle = startIndex === undefined ? undefined : item.segments[startIndex].handleOut.clone();
+									startInHandle = startIndex === undefined ? undefined : item.segments[startIndex].handleIn.clone();
+									item.smooth({from: Math.max(0, startIndex), to: Math.min(item.segments.length - 1, endIndex)});
+								}
+								if (endInHandle) {
+									item.segments[endIndex].handleIn = endInHandle;
+								}
+								if (startOutHandle) {
+									item.segments[startIndex].handleOut = startOutHandle;
+								}
+								if (startInHandle) {
+									item.segments[startIndex].handleIn = startInHandle;
+								}
+							}*/
 						}
-						
 					}
 				}
 			}
