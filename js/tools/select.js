@@ -189,11 +189,6 @@ pg.tools.select = function() {
 			label: 'Ungroup',
 			click: 'pg.group.ungroupSelection'
 		},
-		booleanUnite: {
-			type: 'button',
-			label: 'Merge',
-			click: 'pg.boolean.booleanUnite'
-		},
 		bringToFront: {
 			type: 'button',
 			label: 'Bring to front',
