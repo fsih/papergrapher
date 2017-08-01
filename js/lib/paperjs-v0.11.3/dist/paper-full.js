@@ -8903,10 +8903,12 @@ new function() {
 				ctx.beginPath();
 				ctx.moveTo(pX, pY);
 				ctx.lineTo(hX, hY);
+				ctx.moveTo(hX - half, hY);
+				ctx.lineTo(hX, hY + half);
+				ctx.lineTo(hX + half, hY);
+				ctx.lineTo(hX, hY - half);
+				ctx.lineTo(hX - half, hY);
 				ctx.stroke();
-				ctx.beginPath();
-				ctx.arc(hX, hY, half, 0, Math.PI * 2, true);
-				ctx.fill();
 			}
 		}
 
@@ -8921,11 +8923,7 @@ new function() {
 			if (selection & 4)
 				drawHandle(4);
 			ctx.beginPath();
-			ctx.moveTo(pX - half, pY);
-			ctx.lineTo(pX, pY + half);
-			ctx.lineTo(pX + half, pY);
-			ctx.lineTo(pX, pY - half);
-			ctx.lineTo(pX - half, pY);
+			ctx.arc(pX, pY, half, 0, Math.PI * 2, true);
 			ctx.stroke();
 			var fillStyle = ctx.fillStyle;
 			if (!(selection & 1)) {
