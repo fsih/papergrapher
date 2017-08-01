@@ -8921,7 +8921,11 @@ new function() {
 			if (selection & 4)
 				drawHandle(4);
 			ctx.beginPath();
-			ctx.arc(pX, pY, half, 0, Math.PI * 2, true);
+			ctx.moveTo(pX - half, pY);
+			ctx.lineTo(pX, pY + half);
+			ctx.lineTo(pX + half, pY);
+			ctx.lineTo(pX, pY - half);
+			ctx.lineTo(pX - half, pY);
 			ctx.stroke();
 			var fillStyle = ctx.fillStyle;
 			if (!(selection & 1)) {
