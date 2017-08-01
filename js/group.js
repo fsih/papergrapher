@@ -42,7 +42,7 @@ pg.group = function() {
 		for(var i=0; i<items.length; i++) {
 			var item = items[i];
 			if(isGroup(item) && !item.data.isPGTextItem) {
-				ungroupLoop(item, false);
+				ungroupLoop(item, false /* recursive */);
 
 				if(!item.hasChildren()) {
 					emptyGroups.push(item);
@@ -60,7 +60,7 @@ pg.group = function() {
 
 
 	var ungroupLoop = function(group, recursive) {
-		// don't ungroup items that are no groups
+		// don't ungroup items that are not groups
 		if(!group || !group.children || !isGroup(group)) return;
 				
 		group.applyMatrix = true;
@@ -71,17 +71,17 @@ pg.group = function() {
 
 				// recursion (groups can contain groups, ie. from SVG import)
 				if(recursive) {
-					ungroupLoop(groupChild, true);
+					ungroupLoop(groupChild, true /* recursive */);
 				} else {
 					groupChild.applyMatrix = true;
-					group.layer.addChild(groupChild);
+					groupChild.insertBelow(group);
 					i--;
 				}
 
 			} else {
 				groupChild.applyMatrix = true;
 				// move items from the group to the activeLayer (ungrouping)
-				group.layer.addChild(groupChild);
+				groupChild.insertBelow(group);
 				i--;
 			}
 		}
