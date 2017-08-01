@@ -38,8 +38,8 @@ pg.tools.segmentbrush = function() {
 
 		tool.fixedDistance = 1;
 		tool.onMouseDown = function(event) {
-			tool.minDistance = options.brushWidth/4;
-			tool.maxDistance = options.brushWidth;
+		tool.minDistance = 1;
+		tool.maxDistance = options.brushWidth;
 			if(event.event.button > 0) return;  // only first mouse button
 			
 			finalPath = new Path.Circle({

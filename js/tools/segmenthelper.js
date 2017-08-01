@@ -3,7 +3,7 @@ pg.segmentbrushhelper = function(tool, options) {
 	var lastPoint, finalPath;
 
 	tool.onSegmentMouseDown = function(event) {
-		tool.minDistance = options.brushWidth/4;
+		tool.minDistance = 1;
 		tool.maxDistance = options.brushWidth;
 		
 		finalPath = new Path.Circle({
@@ -38,7 +38,7 @@ pg.segmentbrushhelper = function(tool, options) {
 		path.closed = true;
 		// The unite function on curved paths does not always work (sometimes deletes half the path)
 		// so we have to flatten.
-		path.flatten(options.brushWidth/5);
+		path.flatten(Math.min(options.brushWidth/5, 5));
 		
 		lastPoint = event.point;
 		var newPath = finalPath.unite(path);

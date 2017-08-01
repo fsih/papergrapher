@@ -5,7 +5,7 @@ pg.broadbrushhelper = function(tool, options) {
 	var lastPoint, secondLastPoint, finalPath;
 
 	tool.onBroadMouseDown = function(event) {
-		tool.minDistance = options.brushWidth/4;
+		tool.minDistance = 1;
 		tool.maxDistance = options.brushWidth;
 		if(event.event.button > 0) return;  // only first mouse button
 		
@@ -42,7 +42,7 @@ pg.broadbrushhelper = function(tool, options) {
 		if (finalPath.segments.length === 5) {
 			// Flatten is necessary to prevent smooth from getting rid of the effect
 			// of the handles on the first point.
-			finalPath.flatten(options.brushWidth/5);
+			finalPath.flatten(Math.min(options.brushWidth/5, 5));
 		}
 		finalPath.smooth();
 		lastPoint = event.point;
