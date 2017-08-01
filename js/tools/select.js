@@ -191,13 +191,13 @@ pg.tools.select = function() {
 		},
 		bringToFront: {
 			type: 'button',
-			label: 'Bring to front',
-			click: 'pg.order.bringSelectionToFront'
+			label: 'Bring forward',
+			click: 'pg.order.bringForward'
 		},
 		sendToBack: {
 			type: 'button',
-			label: 'Send to back',
-			click: 'pg.order.sendSelectionToBack'
+			label: 'Send backward',
+			click: 'pg.order.sendBackward'
 		}
 	};
 

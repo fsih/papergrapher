@@ -13,15 +13,45 @@ pg.order = function() {
 	var sendSelectionToBack = function() {
 		pg.undo.snapshot('sendSelectionToBack');
 		var items = pg.selection.getSelectedItems();
-		for(var i=0; i < items.length; i++) {
+		for(var i=items.length - 1; i >= 0; i--) {
 			items[i].sendToBack();
+		}
+	};
+
+	var bringForward = function() {
+		var items = pg.selection.getSelectedItems();
+		// Already at front
+		if (items.length === 0 || !items[items.length - 1].nextSibling) {
+			return;
+		}
+
+		pg.undo.snapshot('bringForward');
+		var nextSibling = items[items.length - 1].nextSibling;
+		for(var i=items.length - 1; i >= 0; i--) {
+			items[i].insertAbove(nextSibling);
+		}
+	};
+
+	var sendBackward = function() {
+		var items = pg.selection.getSelectedItems();
+		// Already at front
+		if (items.length === 0 || !items[0].previousSibling) {
+			return;
+		}
+
+		pg.undo.snapshot('sendBackward');
+		var previousSibling = items[0].previousSibling;
+		for(var i=0; i < items.length; i++) {
+			items[i].insertBelow(previousSibling);
 		}
 	};
 	
 	
 	return {
 		bringSelectionToFront:bringSelectionToFront,
-		sendSelectionToBack:sendSelectionToBack
+		sendSelectionToBack:sendSelectionToBack,
+		bringForward:bringForward,
+		sendBackward: sendBackward
 	};
 	
 }();

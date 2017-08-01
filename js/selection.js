@@ -306,6 +306,7 @@ pg.selection = function() {
 	// this gets all selected non-grouped items and groups
 	// (alternative to paper.project.selectedItems, which includes 
 	// group children in addition to the group)
+	// Returns in increasing Z order
 	var getSelectedItems = function() {
 		var allItems = paper.project.selectedItems;
 		var itemsAndGroups = [];
