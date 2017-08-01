@@ -23,6 +23,8 @@ pg.tools.pen = function() {
 	};
 
 	var activateTool = function() {
+		pg.selection.clearSelection();
+
 		var path;
 		
 		// get options from local storage if present

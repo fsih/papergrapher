@@ -19,6 +19,10 @@ pg.tools.broadbrush = function() {
 	};
 	
 	var activateTool = function() {
+		// TODO: Instead of clearing selection, consider a kind of "draw inside"
+		// analogous to how selection works with eraser
+		pg.selection.clearSelection();
+
 		// get options from local storage if present
 		options = pg.tools.getLocalOptions(options);
 		var tool = new Tool();

@@ -12,6 +12,8 @@ pg.tools.circle = function() {
 	var options = {};
 	
 	var activateTool = function() {
+		pg.selection.clearSelection();
+		
 		tool = new Tool();
 		
 		var shape;

@@ -27,6 +27,7 @@ pg.tools.rectangle = function() {
 	};
 	
 	var activateTool = function() {
+		pg.selection.clearSelection();
 				
 		// get options from local storage if present
 		options = pg.tools.getLocalOptions(options);

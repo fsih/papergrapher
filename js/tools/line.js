@@ -16,6 +16,8 @@ pg.tools.line = function() {
 	};
 	
 	var activateTool = function() {
+		pg.selection.clearSelection();
+		
 		tool = new Tool();
 		
 		var path;

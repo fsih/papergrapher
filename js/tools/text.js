@@ -55,6 +55,7 @@ pg.tools.text = function () {
 	var textAngle = 0;
 
 	var activateTool = function () {
+		pg.selection.clearSelection();
 		
 		var hitItem = null;
 				
