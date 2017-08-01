@@ -8888,7 +8888,7 @@ var Path = PathItem.extend({
 }),
 new function() {
 
-	function drawHandles(ctx, segments, matrix, size) {
+	function drawHandles(ctx, segments, matrix, size, isFullySelected) {
 		if (size === 0) {
 			return;
 		}
@@ -8918,9 +8918,9 @@ new function() {
 			segment._transformCoordinates(matrix, coords);
 			pX = coords[0];
 			pY = coords[1];
-			if (selection & 2)
+			if (selection & 2 && !isFullySelected)
 				drawHandle(2);
-			if (selection & 4)
+			if (selection & 4 && !isFullySelected)
 				drawHandle(4);
 			ctx.beginPath();
 			ctx.arc(pX, pY, half, 0, Math.PI * 2, true);
@@ -9051,7 +9051,7 @@ new function() {
 			ctx.beginPath();
 			drawSegments(ctx, this, matrix);
 			ctx.stroke();
-			drawHandles(ctx, this._segments, matrix, paper.settings.handleSize);
+			drawHandles(ctx, this._segments, matrix, paper.settings.handleSize, this.isFullySelected());
 		}
 	};
 },
