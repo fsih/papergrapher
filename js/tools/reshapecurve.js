@@ -95,7 +95,7 @@ pg.tools.reshapecurve = function() {
 			tolerance: 8 / paper.view.zoom
 		};
 		
-		var doRectSelection = false;
+		var lastHitResult;
 		var selectionRect;
 		
 		var hitType;
@@ -106,8 +106,9 @@ pg.tools.reshapecurve = function() {
 		tool.onMouseDown = function(event) {
 			if(event.event.button > 0) return; // only first mouse button
 			
+			lastHitResult = null;
+			hitType = null;
 			selectionDragged = false;
-			
 			var doubleClicked = false;
 			
 			if(lastEvent) {
@@ -119,14 +120,12 @@ pg.tools.reshapecurve = function() {
 			}
 			lastEvent = event;
 			
-			hitType = null;
 			pg.hover.clearHoveredItem();
 			var hitResults = paper.project.hitTestAll(event.point, hitOptions);
 			if (hitResults.length === 0) {
 				if (!event.modifiers.shift) {
 					pg.selection.clearSelection();
 				}
-				doRectSelection = true;
 				return;
 			}
 
@@ -143,8 +142,21 @@ pg.tools.reshapecurve = function() {
 			if(hitResult && pg.item.isPGTextItem(pg.item.getRootItem(hitResult.item))) {
 				return;
 			}
-				
-			if(hitResult.type === 'fill' || (hitResult.type !== 'segment' && doubleClicked)) {
+			lastHitResult = hitResult;
+
+			// If item is not yet selected, don't behave differently depending on if they clicked a segment
+			// or stroke (since those were invisible), just select the whole thing as if they clicked the fill.
+			if (hitResult && !hitResult.item.selected) {
+				if(event.modifiers.shift) {
+					hitResult.item.fullySelected = true;
+				} else {
+					pg.selection.clearSelection();
+					hitResult.item.selected = false;
+					hitResult.item.fullySelected = true; // TODO: move this behavior to mouse up
+					hitType = 'fill'
+					if(event.modifiers.option) pg.selection.cloneSelection();
+				}
+			} else if (hitResult.type === 'fill' || (hitResult.type !== 'segment' && doubleClicked)) {
 				hitType = 'fill';
 				if(hitResult.item.selected) {
 					if(event.modifiers.shift) {
@@ -158,7 +170,6 @@ pg.tools.reshapecurve = function() {
 						hitResult.item.fullySelected = true;
 					}
 					if(event.modifiers.option) pg.selection.cloneSelection();
-
 				} else {
 					if(event.modifiers.shift) {
 						hitResult.item.fullySelected = true;
@@ -203,9 +214,11 @@ pg.tools.reshapecurve = function() {
 
 				if(hitResult.segment.selected) {
 					// selected points with no handles get handles if selected again
-					hitResult.segment.selected = true;
-					if(event.modifiers.shift) {
+					if (event.modifiers.shift) {
 						hitResult.segment.selected = false;
+					} else {
+						hitResult.item.selected = false;
+						hitResult.segment.selected = true;
 					}
 				} else {
 					if(event.modifiers.shift) {
@@ -300,14 +313,18 @@ pg.tools.reshapecurve = function() {
 		
 		tool.onMouseDrag = function(event) {
 			if(event.event.button > 0) return; // only first mouse button
-			if(doRectSelection) {
+			if(!lastHitResult) {
 				selectionRect = pg.guides.rectSelect(event);
 				// Remove this rect on the next drag and up event
 				selectionRect.removeOnDrag();
 
 			} else {
-				doRectSelection = false;
 				selectionDragged = true;
+				if (hitType === 'point') {
+					if (lastHitResult.segment) {
+						lastHitResult.segment.selected = true;
+					}
+				}
 				
 				var selectedItems = paper.project.selectedItems; //pg.selection.getSelectedItems();
 				var dragVector = (event.point - event.downPoint);
@@ -452,7 +469,7 @@ pg.tools.reshapecurve = function() {
 		tool.onMouseUp = function(event) {
 			if(event.event.button > 0) return; // only first mouse button
 		
-			if(doRectSelection && selectionRect) {
+			if(!lastHitResult && selectionRect) {
 				pg.selection.processRectangularSelection(event, selectionRect, 'detail');
 				selectionRect.remove();
 				
@@ -480,7 +497,6 @@ pg.tools.reshapecurve = function() {
 				}
 			}
 			
-			doRectSelection = false;
 			selectionRect = null;
 
 		};
