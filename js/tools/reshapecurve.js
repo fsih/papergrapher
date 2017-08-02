@@ -86,6 +86,20 @@ pg.tools.reshapecurve = function() {
 		paper.settings.handleSize = 8;
 				
 		var hitOptions = {
+			match: function(item) {
+				if (item.type === 'handle-out' || item.type === 'handle-in') {
+					// Only hit test against handles that are visible, that is,
+					// their segment is selected
+					if (!item.segment.selected) {
+						return false;
+					}
+					// If the entire shape is selected, handles are hidden
+					if (item.item.fullySelected) {
+						return false;
+					}
+				}
+				return true;
+			},
 			segments: true,
 			stroke: true,
 			curves: true,
@@ -94,7 +108,8 @@ pg.tools.reshapecurve = function() {
 			guide: false,
 			tolerance: 8 / paper.view.zoom
 		};
-		
+
+		// TODO class needs to be refactored to get rid of all this flaky state
 		var lastHitResult;
 		var selectionRect;
 		
@@ -121,6 +136,8 @@ pg.tools.reshapecurve = function() {
 			lastEvent = event;
 			
 			pg.hover.clearHoveredItem();
+
+			// Choose hit result ===========================================================
 			var hitResults = paper.project.hitTestAll(event.point, hitOptions);
 			if (hitResults.length === 0) {
 				if (!event.modifiers.shift) {
@@ -143,6 +160,7 @@ pg.tools.reshapecurve = function() {
 				return;
 			}
 			lastHitResult = hitResult;
+			//===============================================================================
 
 			// If item is not yet selected, don't behave differently depending on if they clicked a segment
 			// or stroke (since those were invisible), just select the whole thing as if they clicked the fill.
