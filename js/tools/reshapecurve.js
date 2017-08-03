@@ -321,8 +321,12 @@ pg.tools.reshapecurve = function() {
 
 				var seg = hitResult.segment;
 			}
-			
 			pg.statusbar.update();
+			pg.stylebar.updateFromSelection(paper.project.selectedItems);
+			pg.stylebar.blurInputs();
+		
+		jQuery(document).trigger('SelectionChanged');
+		
 		};
 		
 		tool.onMouseMove = function(event) {

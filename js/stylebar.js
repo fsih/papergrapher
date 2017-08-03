@@ -375,8 +375,7 @@ pg.stylebar = function() {
 	};
 	
 	
-	var updateFromSelection = function() {		
-		var selectedItems = pg.selection.getSelectedItems();
+	var updateFromSelection = function(selectedItems) {
 		var selectionFillColorString = null;
 		var selectionStrokeColorString = null;
 		var selectionOpacity = null;

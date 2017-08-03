@@ -295,7 +295,7 @@ pg.selection = function() {
 			}
 		}
 		pg.statusbar.update();
-		pg.stylebar.updateFromSelection();
+		pg.stylebar.updateFromSelection(pg.selection.getSelectedItems());
 		pg.stylebar.blurInputs();
 		
 		jQuery(document).trigger('SelectionChanged');
