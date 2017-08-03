@@ -202,6 +202,7 @@ pg.tools.select = function() {
 	};
 
 	var activateTool = function() {
+		pg.selection.clearSelection();
 		setSelectionBounds();
 		preProcessSelection();
 		tool = new Tool();
