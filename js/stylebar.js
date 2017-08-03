@@ -262,18 +262,24 @@ pg.stylebar = function() {
 	};
 	
 	
-	var applyFillColorToSelection = function(colorString) {
-		var items = pg.selection.getSelectedItems();
+	var applyFillColorToSelection = function(colorString, items) {
+		var items = pg.selection.getSelectedItems(true /* recursive */);
 		for(var i=0; i<items.length; i++) {
 			var item = items[i];
 			if(pg.item.isPGTextItem(item)) {
 				for(var j=0; j<item.children.length; j++) {
 					var child = item.children[j];
-					for(var k=0; k<child.children.length; k++) {
-						var path = child.children[k];
-						if(!path.data.isPGGlyphRect) {
-							path.fillColor = colorString;
+					if (child.children) {
+						for(var k=0; k<child.children.length; k++) {
+							var path = child.children[k];
+							if(!path.data.isPGGlyphRect) {
+								path.fillColor = colorString;
+							}
 						}
+					} else {
+						if(!child.data.isPGGlyphRect) {
+								child.fillColor = colorString;
+							}
 					}
 				}
 			} else {
@@ -288,18 +294,30 @@ pg.stylebar = function() {
 
 
 	var applyStrokeColorToSelection = function(colorString) {
-		var items = pg.selection.getSelectedItems();
+		var items = pg.selection.getSelectedItems(true /* recursive */);
 
 		for(var i=0; i<items.length; i++) {
 			var item = items[i];
 			if(pg.item.isPGTextItem(item)) {
-				for(var j=0; j<item.children.length; j++) {
-					var child = item.children[j];
-					for(var k=0; k<child.children.length; k++) {
-						var path = child.children[k];
-						if(!path.data.isPGGlyphRect) {
-							path.strokeColor = colorString;
+				if (item.children) {
+					for(var j=0; j<item.children.length; j++) {
+						var child = item.children[j];
+						if (child.children) {
+							for(var k=0; k<child.children.length; k++) {
+								var path = child.children[k];
+								if(!path.data.isPGGlyphRect) {
+									path.strokeColor = colorString;
+								}
+							}
+						} else {
+							if(!child.data.isPGGlyphRect) {
+								child.strokeColor = colorString;
+							}
 						}
+					}
+				} else {
+					if(!item.data.isPGGlyphRect) {
+						item.strokeColor = colorString;
 					}
 				}
 			} else {
@@ -331,7 +349,7 @@ pg.stylebar = function() {
 	
 	
 	var applyStrokeWidthToSelection = function(value) {
-		var items = pg.selection.getSelectedItems();
+		var items = pg.selection.getSelectedItems(true /* recursive */);
 
 		for(var i=0; i<items.length; i++) {
 			var item = items[i];
@@ -375,7 +393,8 @@ pg.stylebar = function() {
 	};
 	
 	
-	var updateFromSelection = function(selectedItems) {
+	var updateFromSelection = function(recursive) {
+		var selectedItems = pg.selection.getSelectedItems(recursive);
 		var selectionFillColorString = null;
 		var selectionStrokeColorString = null;
 		var selectionOpacity = null;

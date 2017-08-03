@@ -295,7 +295,7 @@ pg.selection = function() {
 			}
 		}
 		pg.statusbar.update();
-		pg.stylebar.updateFromSelection(pg.selection.getSelectedItems());
+		pg.stylebar.updateFromSelection();
 		pg.stylebar.blurInputs();
 		
 		jQuery(document).trigger('SelectionChanged');
@@ -307,15 +307,24 @@ pg.selection = function() {
 	// (alternative to paper.project.selectedItems, which includes 
 	// group children in addition to the group)
 	// Returns in increasing Z order
-	var getSelectedItems = function() {
+	var getSelectedItems = function(recursive) {
 		var allItems = paper.project.selectedItems;
 		var itemsAndGroups = [];
 
-		for(var i=0; i<allItems.length; i++) {
-			var item = allItems[i];
-			if(pg.group.isGroup(item) &&
-				!pg.group.isGroup(item.parent) ||
-				!pg.group.isGroup(item.parent)) {
+		if (!recursive) {
+			for(var i=0; i<allItems.length; i++) {
+				var item = allItems[i];
+				if(pg.group.isGroup(item) &&
+					!pg.group.isGroup(item.parent) ||
+					!pg.group.isGroup(item.parent)) {
+					if(item.data && !item.data.isSelectionBound) {
+						itemsAndGroups.push(item);
+					}
+				}
+			}
+		} else {
+			for(var i=0; i<allItems.length; i++) {
+				var item = allItems[i];
 				if(item.data && !item.data.isSelectionBound) {
 					itemsAndGroups.push(item);
 				}

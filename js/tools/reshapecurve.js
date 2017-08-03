@@ -322,7 +322,7 @@ pg.tools.reshapecurve = function() {
 				var seg = hitResult.segment;
 			}
 			pg.statusbar.update();
-			pg.stylebar.updateFromSelection(paper.project.selectedItems);
+			pg.stylebar.updateFromSelection(true /* recursive */);
 			pg.stylebar.blurInputs();
 		
 		jQuery(document).trigger('SelectionChanged');
@@ -348,7 +348,7 @@ pg.tools.reshapecurve = function() {
 					}
 				}
 				
-				var selectedItems = paper.project.selectedItems; //pg.selection.getSelectedItems();
+				var selectedItems = pg.selection.getSelectedItems(true /* recursive */);
 				var dragVector = (event.point - event.downPoint);
 				
 				for(var i=0; i < selectedItems.length; i++) {
