@@ -38,6 +38,7 @@ pg.group = function() {
 
 	// ungroup items (only top hierarchy)
 	var ungroupItems = function(items) {
+		pg.selection.clearSelection();
 		var emptyGroups = [];
 		for(var i=0; i<items.length; i++) {
 			var item = items[i];
@@ -68,22 +69,17 @@ pg.group = function() {
 		for(var i=0; i<group.children.length; i++) {
 			var groupChild = group.children[i];
 			if(groupChild.hasChildren()) {
-
 				// recursion (groups can contain groups, ie. from SVG import)
 				if(recursive) {
 					ungroupLoop(groupChild, true /* recursive */);
-				} else {
-					groupChild.applyMatrix = true;
-					groupChild.insertBelow(group);
-					i--;
+					continue;
 				}
-
-			} else {
-				groupChild.applyMatrix = true;
-				// move items from the group to the activeLayer (ungrouping)
-				groupChild.insertBelow(group);
-				i--;
 			}
+			groupChild.applyMatrix = true;
+			// move items from the group to the activeLayer (ungrouping)
+			groupChild.insertBelow(group);
+			groupChild.selected = true;
+			i--;
 		}
 	};
 

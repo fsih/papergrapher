@@ -267,26 +267,60 @@ pg.tools.select = function() {
 					origCenter = boundsPath.bounds.center;
 					scaleItems = pg.selection.getSelectedItems();
 				} 
-				// TODO: add anchor point move
 				else { // Move mode
 					// deselect all by default if the shift key isn't pressed
 					// also needs some special love for compound paths and groups,
 					// as their children are not marked as "selected"
-					if(!event.modifiers.shift) {
-						var root = pg.item.getRootItem(hitResult.item);
-						if(pg.item.isCompoundPathItem(root) || pg.group.isGroup(root)) {
-							if(!root.selected) {
-								pg.selection.clearSelection();
-							}
-						} else if(!hitResult.item.selected) {
-							pg.selection.clearSelection();
-						}
-					}
 					// deselect a currently selected item if shift is pressed
-					if(event.modifiers.shift && hitResult.item.selected) {
-						pg.selection.setItemSelection(hitResult.item, false);
+					var root = pg.item.getRootItem(hitResult.item);
+					if(pg.item.isCompoundPathItem(root) || pg.group.isGroup(root)) {
+						if(!root.selected) {
+							if (!event.modifiers.shift) {
+								pg.selection.clearSelection()
+							}
+							root.selected = true;
+							for (var i = 0; i < root.children.length; i++) {
+								root.children[i].selected = true;
+							}
+							if(event.modifiers.alt) {
+								mode = 'cloneMove';
+								pg.selection.cloneSelection();
 
+							} else {
+								mode = 'move';
+							}
+						} else {
+							if (event.modifiers.shift) {
+								root.selected = false;
+								for (var i = 0; i < root.children.length; i++) {
+									root.children[i].selected = false;
+								}
+							} else {
+								if(event.modifiers.alt) {
+									mode = 'cloneMove';
+									pg.selection.cloneSelection();
+
+								} else {
+									mode = 'move';
+								}
+							}
+						}
+					} else if(hitResult.item.selected) {
+						if (event.modifiers.shift) {
+							pg.selection.setItemSelection(hitResult.item, false);
+						} else {
+							if(event.modifiers.alt) {
+								mode = 'cloneMove';
+								pg.selection.cloneSelection();
+
+							} else {
+								mode = 'move';
+							}
+						}
 					} else {
+						if (!event.modifiers.shift) {
+							pg.selection.clearSelection()
+						}
 						pg.selection.setItemSelection(hitResult.item, true);
 
 						if(event.modifiers.alt) {
