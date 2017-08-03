@@ -235,7 +235,7 @@ pg.tools.reshapecurve = function() {
 					if (event.modifiers.shift) {
 						hitResult.segment.selected = false;
 					} else {
-						hitResult.item.selected = false;
+						paper.project.deselectAll();
 						hitResult.segment.selected = true;
 					}
 				} else {
