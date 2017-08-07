@@ -7,13 +7,28 @@ body {
 }
 
 #paperCanvas {
-	width: 1000px;
-	height: 800px;
-	top: 30px;
-	left: 76px;
+	width: 500px;
+	height: 400px;
     border: 1px solid aliceblue;
     border-radius: 2px;
-	background-color: #fff
+	margin: auto;  
+	position: relative;
+	left:0;
+	right: 0;
+	top: 2px;
+	bottom: 0;
+}
+
+#canvasContainer {
+	width: 502px;
+	height: 402px;
+	top: 30px;
+	left: 76px;
+	background-color: #fff;
+	border: 1px solid aliceblue;
+	border-radius: 2px;
+	position: relative;
+	overflow: visible;
 }
 
 .toolbar {

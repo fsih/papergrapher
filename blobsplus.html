@@ -16,7 +16,9 @@
 	<link href="css/blobsplus.css" rel="stylesheet" />
 </head>
 <body>
-	<canvas id="paperCanvas" data-paper-resize="false" data-paper-hidpi="off"></canvas>
+	<div id="canvasContainer">
+		<canvas id="paperCanvas" data-paper-resize="false" data-paper-hidpi="off"></canvas>
+	</div>
 	
 	<div id="loadingScreen" class="loadingScreen">
 		<div class="panel">Loading...</div>
@@ -35,8 +37,8 @@
 			<li class="redo_button">Redo</li>
 
 			<!-- Zoom Container -->
-			<li class="empty hidden">
-			<div class="zoomContainer hidden">
+			<li class="empty">
+			<div class="zoomContainer">
 				<label class="zoomLabel">Zoom</label>
 				<input type="number"  min="0" max="6000" maxlength="4" id="zoomInput" value="100" class="zoomInput comboInput"/>
 				<select id="zoomSelect" class="zoomSelect comboSelect">
