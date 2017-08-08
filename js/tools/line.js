@@ -134,6 +134,7 @@ pg.tools.line = function() {
 			if (path.segments.length < 2 || path.segments.length === 2 && path.firstSegment.point.getDistance(event.point, true) < tool.tolerance() * tool.tolerance()) {
 				path.remove();
 				path = null;
+				// TODO don't erase the line if both ends are snapped to different points
 				return;
 			} else if (path.lastSegment.point.getDistance(path.segments[path.segments.length - 2].point, true) < tool.tolerance() * tool.tolerance()) {
 				path.removeSegment(path.segments.length - 1);
