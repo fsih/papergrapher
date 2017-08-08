@@ -16,10 +16,11 @@ pg.statusbar = function() {
 	};
 	
 	var zoom = function (scale) {
-		if (scale === 0 || isNaN(scale)) {
-			scale = Math.round(paper.view.zoom*100); // current value
-			update();
+		if (scale == 0 || isNaN(scale)) {
 			return;
+		}
+		if (scale > 30) {
+			scale = 30;
 		}
 		var verticalScrollPercent = .5;
 		var horizontalScrollPercent = .5;
@@ -51,6 +52,7 @@ pg.statusbar = function() {
 	}
 	var update = function() {
 		jQuery('#zoomInput').val(Math.round(paper.view.zoom*100));
+		jQuery('#zoomSelect').val(paper.view.zoom);
 		
 		var selectionType = pg.selection.getSelectionType();
 		if(selectionType) {
