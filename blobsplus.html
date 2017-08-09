@@ -36,27 +36,6 @@
 			<li class="undo_button">Undo</li>
 			<li class="redo_button">Redo</li>
 
-			<!-- Zoom Container -->
-			<li class="empty">
-			<div class="zoomContainer">
-				<label class="zoomLabel">Zoom</label>
-				<input type="number"  min="0" max="6000" maxlength="4" id="zoomInput" value="100" class="zoomInput comboInput"/>
-				<select id="zoomSelect" class="zoomSelect comboSelect">
-					<option class="hidden" value=""></option>
-					<option value="1">100%</option>
-					<option value="10">1000%</option>
-					<option value="5">500%</option>
-					<option value="3">300%</option>
-					<option value="2">200%</option>
-					<option value="1.5">150%</option>
-					<option value="0.5">50%</option>
-					<option value="0.2">20%</option>
-					<option value="0.1">10%</option>
-					<option value="">Custom</option>
-				</select>
-			</div>
-			</li>
-
 			<li class="topMenuButton hidden"><svg class="burgerButton" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"><line stroke-width="12" x1="0" y1="9.5" x2="100" y2="9.5"/><line stroke-width="12" x1="0" y1="50.5" x2="100" y2="50.5"/><line stroke-width="12" x1="0" y1="90.5" x2="100" y2="90.5"/></svg>
 				<ul class="subMenu">
 					<li class="clearDocument_button">New</li>
@@ -184,6 +163,24 @@
 				<button class="inputHelper increase" id="increaseStrokeWidthButton">▴</button>
 				<button class="inputHelper decrease" id="decreaseStrokeWidthButton">▾</button>
 			</div>
+		</div>
+		<!-- Zoom Container -->
+		<div class="zoomContainer toolbarSection extraSpace">
+			<label class="toolbarLabel">Zoom</label>
+			<input type="number"  min="0" max="6000" maxlength="4" id="zoomInput" value="100" class="zoomInput comboInput"/>
+			<select id="zoomSelect" class="zoomSelect comboSelect">
+				<option class="hidden" value=""></option>
+				<option value="1">100%</option>
+				<option value="10">1000%</option>
+				<option value="5">500%</option>
+				<option value="3">300%</option>
+				<option value="2">200%</option>
+				<option value="1.5">150%</option>
+				<option value="0.5">50%</option>
+				<option value="0.2">20%</option>
+				<option value="0.1">10%</option>
+				<option value="">Custom</option>
+			</select>
 		</div>
 	</div>
 	
