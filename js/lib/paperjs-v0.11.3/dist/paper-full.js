@@ -4525,6 +4525,7 @@ new function() {
 				half = size / 2;
 			ctx.strokeStyle = ctx.fillStyle = color
 					? color.toCanvasStyle(ctx) : '#009dec';
+			ctx.lineWidth=2.5;
 			if (itemSelected)
 				this._drawSelected(ctx, mx, selectionItems);
 			if (positionSelected) {
