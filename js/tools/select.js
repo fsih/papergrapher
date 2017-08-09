@@ -634,7 +634,7 @@ pg.tools.select = function() {
 				var rotHandle = arrows.unite(line);
 				line.remove();
 				arrows.remove();
-				rotHandle.scale(1/paper.view.zoom, segment.point)
+				rotHandle.scale(1/paper.view.zoom, segment.point);
 				rotHandle.data = {
 					offset: offset,
 					isRotHandle: true,
