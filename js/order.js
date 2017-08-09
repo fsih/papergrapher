@@ -46,12 +46,29 @@ pg.order = function() {
 		}
 	};
 	
+	var shouldShowSendBackward = function() {
+		var items = pg.selection.getSelectedItems();
+		if (items.length === 0 || !items[0].previousSibling) {
+			return false;
+		}
+		return true;
+	};
+
+	var shouldShowBringForward = function() {
+		var items = pg.selection.getSelectedItems();
+		if (items.length === 0 || !items[items.length - 1].nextSibling) {
+			return false;
+		}
+		return true;
+	};
 	
 	return {
 		bringSelectionToFront:bringSelectionToFront,
 		sendSelectionToBack:sendSelectionToBack,
 		bringForward:bringForward,
-		sendBackward: sendBackward
+		sendBackward: sendBackward,
+		shouldShowBringForward:shouldShowBringForward,
+		shouldShowSendBackward:shouldShowSendBackward
 	};
 	
 }();

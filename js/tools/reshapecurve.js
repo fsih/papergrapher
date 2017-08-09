@@ -62,22 +62,26 @@ pg.tools.reshapecurve = function() {
 		selectAll: {
 			type: 'button',
 			label: 'Select all',
-			click: 'pg.selection.selectAllSegments'
+			click: 'pg.selection.selectAllSegments',
+			shouldShow: pg.selection.shouldShowSelectAll
 		},
 		selectNone: {
 			type: 'button',
 			label: 'Deselect all',
-			click: 'pg.selection.clearSelection'
+			click: 'pg.selection.clearSelection',
+			shouldShow: pg.selection.shouldShowIfSelection
 		},
 		removeSegments: {
 			type: 'button',
 			label: 'Remove points',
-			click: 'pg.selection.removeSelectedSegments'
+			click: 'pg.selection.removeSelectedSegments',
+			shouldShow: pg.selection.shouldShowIfSelectionRecursive
 		},
 		splitPath: {
 			type: 'button',
 			label: 'Split path',
-			click: 'pg.selection.splitPathAtSelectedSegments'
+			click: 'pg.selection.splitPathAtSelectedSegments',
+			shouldShow: pg.selection.shouldShowIfSelectionRecursive
 		}
 	};
 

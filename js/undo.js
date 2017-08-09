@@ -10,6 +10,26 @@ pg.undo = function() {
 		pg.undo.snapshot('init');
 	};
 	
+	var updateButtonVisibility = function() {
+		if (head === 0) {
+			$(".undo_button").addClass('hidden');
+		} else {
+			$(".undo_button").removeClass('hidden');
+		}
+			
+		if(head === states.length-1) {
+			$(".redo_button").addClass('hidden');
+		} else {
+			$(".redo_button").removeClass('hidden');
+		}
+
+		if ($(".redo_button").hasClass('hidden') && $(".undo_button").hasClass('hidden')) {
+			$("#undo_redo_placeholder").addClass('hidden');
+		} else {
+			$("#undo_redo_placeholder").removeClass('hidden');
+		}
+	}
+
 	var snapshot = function(type) {
 		var state = {
 			type : type, 
@@ -31,7 +51,8 @@ pg.undo = function() {
 		
 		// set the head to the states length
 		head = states.length-1;
-		
+
+		updateButtonVisibility();
 	};
 	
 	
@@ -40,6 +61,7 @@ pg.undo = function() {
 			head--;
 			restore(states[head]);
 			jQuery(document).trigger('Undo');
+			updateButtonVisibility();
 		}
 	};
 	
@@ -49,6 +71,7 @@ pg.undo = function() {
 			head++;
 			restore(states[head]);
 			jQuery(document).trigger('Redo');
+			updateButtonVisibility();
 		}
 	};
 	

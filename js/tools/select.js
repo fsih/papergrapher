@@ -164,40 +164,59 @@ pg.tools.select = function() {
 	};
 
 	var simpleMenuEntries = {
+		selectAll: {
+			type: 'button',
+			label: 'Select all',
+			click: 'pg.selection.selectAllSegments',
+			shouldShow: pg.selection.shouldShowSelectAll
+		},
+		selectNone: {
+			type: 'button',
+			label: 'Deselect all',
+			click: 'pg.selection.clearSelection',
+			shouldShow: pg.selection.shouldShowIfSelection
+		},
 		copySelection: {
 			type: 'button',
 			label: 'Copy',
-			click: 'pg.edit.copySelectionToClipboard'
+			click: 'pg.edit.copySelectionToClipboard',
+			shouldShow: pg.selection.shouldShowIfSelection
 		},
 		pasteSelection: {
 			type: 'button',
 			label: 'Paste',
-			click: 'pg.edit.pasteObjectsFromClipboard'
+			click: 'pg.edit.pasteObjectsFromClipboard',
+			shouldShow: pg.edit.shouldShowPaste
 		},
 		deleteSelection: {
 			type: 'button',
 			label: 'Delete',
-			click: 'pg.selection.deleteSelection'
+			click: 'pg.selection.deleteSelection',
+			shouldShow: pg.selection.shouldShowIfSelection
 		},
 		groupSelection: {
 			type: 'button',
 			label: 'Group',
-			click: 'pg.group.groupSelection'
+			click: 'pg.group.groupSelection',
+			shouldShow: pg.group.shouldShowGroup
 		},
 		ungroupSelection: {
 			type: 'button',
 			label: 'Ungroup',
-			click: 'pg.group.ungroupSelection'
+			click: 'pg.group.ungroupSelection',
+			shouldShow: pg.group.shouldShowUngroup
 		},
-		bringToFront: {
+		bringForward: {
 			type: 'button',
 			label: 'Bring forward',
-			click: 'pg.order.bringForward'
+			click: 'pg.order.bringForward',
+			shouldShow: pg.order.shouldShowBringForward
 		},
-		sendToBack: {
+		sendBackward: {
 			type: 'button',
 			label: 'Send backward',
-			click: 'pg.order.sendBackward'
+			click: 'pg.order.sendBackward',
+			shouldShow: pg.order.shouldShowSendBackward
 		}
 	};
 
@@ -563,18 +582,24 @@ pg.tools.select = function() {
 		
 		jQuery(document).on('DeleteItems Undo Grouped Ungrouped SelectionChanged', function(){
 			setSelectionBounds();
+			setupToolEntries();
 		});
 		
 		// setup floating tool options panel in the editor
 		//pg.toolOptionPanel.setup(options, components, function(){ });
 
+		setupToolEntries();
+		tool.activate();
+	};
+
+	var setupToolEntries = function() {
+		pg.menu.clearToolEntries();
 		if (mode === "ORIGINAL") {
 			pg.menu.setupToolEntries(menuEntries);
 		} else {
 			pg.menu.setupToolEntries(simpleMenuEntries);
 		}		
-		tool.activate();
-	};
+	}
 
 	var deactivateTool = function() {
 		pg.hover.clearHoveredItem();
@@ -751,7 +776,8 @@ pg.tools.select = function() {
 	return {
 		options: options,
 		activateTool: activateTool,
-		deactivateTool: deactivateTool
+		deactivateTool: deactivateTool,
+		setupToolEntries: setupToolEntries
 	};
 	
 };

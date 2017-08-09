@@ -30,10 +30,16 @@ pg.edit = function() {
 			paper.project.view.update();
 		}
 	};
+
+	var shouldShowPaste = function() {
+		var clipboard = pg.document.getClipboard();
+		return clipboard && clipboard.length > 0;
+	}
 	
 	return {
 		copySelectionToClipboard:copySelectionToClipboard,
-		pasteObjectsFromClipboard:pasteObjectsFromClipboard
+		pasteObjectsFromClipboard:pasteObjectsFromClipboard,
+		shouldShowPaste:shouldShowPaste
 	};
 	
 }();

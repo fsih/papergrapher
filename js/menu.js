@@ -207,11 +207,16 @@ pg.menu = function() {
 		var $toolMenu = jQuery('#topMenu');	
 		jQuery.each(entries, function(index, entry) {
 			if(entry.type == 'button') {
+				if (!entry.shouldShow()) {
+					return;
+				}
 				var classString = entry.class ? ' '+entry.class : '' ;
 				var $toolButton = jQuery('<li class="button toolSpecific'+classString+'" data-click="'+entry.click+'">'+entry.label+'</li>');
 				$toolButton.click(function() {
 					var func = jQuery(this).attr('data-click');
 					pg.helper.executeFunctionByName(func, window);
+					clearToolEntriesTopLevel();
+					setupToolEntriesTopLevel(entries);
 					setTimeout(function() {
 						hideMenus();
 					}, 100);

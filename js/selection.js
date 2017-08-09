@@ -569,6 +569,16 @@ pg.selection = function() {
 		itemBounds.remove();
 	};
 	
+
+	var shouldShowIfSelection = function() {
+		return pg.selection.getSelectedItems().length > 0;
+	}
+	var shouldShowIfSelectionRecursive = function() {
+		return pg.selection.getSelectedItems(true /* recursive */).length > 0;
+	}
+	var shouldShowSelectAll = function() {
+		return paper.project.getItems({class: paper.PathItem}).length > 0;
+	}
 	
 	return {
 		getSelectionMode: getSelectionMode,
@@ -589,7 +599,10 @@ pg.selection = function() {
 		getSelectedPaths: getSelectedPaths,
 		switchSelectedHandles: switchSelectedHandles,
 		removeSelectedSegments: removeSelectedSegments,
-		processRectangularSelection: processRectangularSelection
+		processRectangularSelection: processRectangularSelection,
+		shouldShowIfSelection: shouldShowIfSelection,
+		shouldShowIfSelectionRecursive: shouldShowIfSelectionRecursive,
+		shouldShowSelectAll: shouldShowSelectAll
 	};
 	
 }();

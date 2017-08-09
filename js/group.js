@@ -104,8 +104,23 @@ pg.group = function() {
 		var rootItem = pg.item.getRootItem(item);
 		return isGroup(rootItem);
 	};
+
+	var shouldShowGroup = function() {
+		var items = pg.selection.getSelectedItems();
+		return items.length > 1;
+	};
 	
-	
+	var shouldShowUngroup = function() {
+		var items = pg.selection.getSelectedItems();
+		for(var i=0; i<items.length; i++) {
+			var item = items[i];
+			if(isGroup(item) && !item.data.isPGTextItem && item.children && item.children.length > 0) {
+				return true;
+			}
+		}
+		return false;
+	};
+
 	return {
 		groupSelection: groupSelection,
 		ungroupSelection: ungroupSelection,
@@ -113,7 +128,9 @@ pg.group = function() {
 		ungroupItems: ungroupItems,
 		getItemsGroup: getItemsGroup,
 		isGroup: isGroup,
-		isGroupChild:isGroupChild
+		isGroupChild:isGroupChild,
+		shouldShowGroup:shouldShowGroup,
+		shouldShowUngroup:shouldShowUngroup
 	};
 
 }();

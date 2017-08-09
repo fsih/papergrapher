@@ -36,54 +36,7 @@
 			<li class="undo_button">Undo</li>
 			<li class="redo_button">Redo</li>
 
-			<li class="topMenuButton hidden"><svg class="burgerButton" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"><line stroke-width="12" x1="0" y1="9.5" x2="100" y2="9.5"/><line stroke-width="12" x1="0" y1="50.5" x2="100" y2="50.5"/><line stroke-width="12" x1="0" y1="90.5" x2="100" y2="90.5"/></svg>
-				<ul class="subMenu">
-					<li class="clearDocument_button">New</li>
-					<li class="importJSON_button">Open<input id="fileUploadJSON" class="fileUploadInput" type="file" accept=".json" ></li>
-					<li class="exportJSON_button">Save</li>
-					<li class="space"></li>
-					<li class="undo_button halfWidth left">Undo</li>
-					<li class="redo_button halfWidth right">Redo</li>
-					<li class="space"></li>
-					<li class="importMenu hasSubSubMenu">Import
-						<ul class="subSubMenu">
-							<li class="importImage_button">Image<input id="fileUploadImage" class="fileUploadInput" type="file" accept=".gif, .jpg, .jpeg, .png" ></li>
-					<li class="importImageFromURL_button">Image from URL</li>
-							<li class="importSVG_button">SVG<input id="fileUploadSVG" class="fileUploadInput" type="file" accept=".svg" ></li>
-					<li class="importSVGFromURL_button">SVG from URL</li>
-						</ul>
-					</li>
-					<li class="exportMenu hasSubSubMenu">Export
-						<ul class="subSubMenu">
-							<li class="exportImage_button">Image</li>
-							<li class="exportSVG_button">SVG</li>
-						</ul>
-					</li>
-					<li class="space"></li>
-					<li class="layerPanelButton" title="Layer Panel">Layers</li>
-					<li class="scriptEditorButton" title="Script Editor">Script Editor</li>
-					<li class="space"></li>
-					<li class="hasSubSubMenu">View
-						<ul class="subSubMenu">
-							<li class="zoomIn_button" title="Alt-ScrollUp">Zoom in</li>
-							<li class="zoomOut_button" title="Alt-ScrollDown">Zoom out</li>
-							<li class="resetZoom_button" title="Ctrl-1">Reset zoom</li>
-							<li class="resetPan_button">Reset pan</li>
-						</ul>
-					</li>					
-					<li class="space"></li>
-					<li class="resetSettings_button">Reset Settings</li>
-					<li class="space"></li>
-					<li class="aboutButton" title="About">About</li>
-				</ul>
-			</li>
-			
-			<li class="topMenuButton hidden">Tool
-				<ul class="subMenu" id="toolSubMenu">
-				</ul>
-			</li>
-
-			<li class="placeholder"></li>
+			<li id="undo_redo_placeholder" class="placeholder"></li>
 		</ul>
 	</nav>
 	
