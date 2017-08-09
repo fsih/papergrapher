@@ -24,12 +24,16 @@ pg.tools.bezier = function() {
 		var type;
 		var hoveredItem = null;
 		
+		var tolerance = 5;
 		var hitOptions = {
 			segments: true,
 			stroke: true,
 			curves: true,
 			guide: false,
-			tolerance: 5 / paper.view.zoom
+		};
+		var getHitOptions = function() {
+			hitOptions.tolerance = tolerance / paper.view.zoom;
+			return hitOptions;
 		};
 		
 		tool.onMouseDown = function(event) {
@@ -124,7 +128,7 @@ pg.tools.bezier = function() {
 		};
 		
 		tool.onMouseMove = function(event) {			
-			var hitResult = paper.project.hitTest(event.point, hitOptions);
+			var hitResult = paper.project.hitTest(event.point, getHitOptions());
 			if(hitResult && hitResult.item && hitResult.item.selected) {
 				hoveredItem = hitResult;
 				

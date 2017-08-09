@@ -85,6 +85,7 @@ pg.tools.reshapecurve = function() {
 		tool = new Tool();
 		paper.settings.handleSize = 8;
 				
+		var tolerance = 8;
 		var hitOptions = {
 			match: function(item) {
 				if (item.type === 'handle-out' || item.type === 'handle-in') {
@@ -106,7 +107,10 @@ pg.tools.reshapecurve = function() {
 			handles: true,
 			fill: true,
 			guide: false,
-			tolerance: 8 / paper.view.zoom
+		};
+		var getHitOptions = function() {
+			hitOptions.tolerance = tolerance / paper.view.zoom;
+			return hitOptions;
 		};
 
 		// TODO class needs to be refactored to get rid of all this flaky state
@@ -138,7 +142,7 @@ pg.tools.reshapecurve = function() {
 			pg.hover.clearHoveredItem();
 
 			// Choose hit result ===========================================================
-			var hitResults = paper.project.hitTestAll(event.point, hitOptions);
+			var hitResults = paper.project.hitTestAll(event.point, getHitOptions());
 			if (hitResults.length === 0) {
 				if (!event.modifiers.shift) {
 					pg.selection.clearSelection();
@@ -330,7 +334,7 @@ pg.tools.reshapecurve = function() {
 		};
 		
 		tool.onMouseMove = function(event) {
-			pg.hover.handleHoveredItem(hitOptions, event);
+			pg.hover.handleHoveredItem(getHitOptions(), event);
 		};
 		
 		tool.onMouseDrag = function(event) {

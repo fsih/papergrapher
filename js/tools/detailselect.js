@@ -61,6 +61,7 @@ pg.tools.detailselect = function() {
 	var activateTool = function() {		
 		tool = new Tool();
 				
+		var tolerance = 3;
 		var hitOptions = {
 			segments: true,
 			stroke: true,
@@ -68,7 +69,10 @@ pg.tools.detailselect = function() {
 			handles: true,
 			fill: true,
 			guide: false,
-			tolerance: 3 / paper.view.zoom
+		};
+		var getHitOptions = function() {
+			hitOptions.tolerance = tolerance / paper.view.zoom;
+			return hitOptions;
 		};
 		
 		var doRectSelection = false;
@@ -100,7 +104,7 @@ pg.tools.detailselect = function() {
 			
 			hitType = null;
 			pg.hover.clearHoveredItem();
-			var hitResult = paper.project.hitTest(event.point, hitOptions);
+			var hitResult = paper.project.hitTest(event.point, getHitOptions());
 			if (!hitResult) {
 				if (!event.modifiers.shift) {
 					pg.selection.clearSelection();
@@ -194,7 +198,7 @@ pg.tools.detailselect = function() {
 		};
 		
 		tool.onMouseMove = function(event) {
-			pg.hover.handleHoveredItem(hitOptions, event);
+			pg.hover.handleHoveredItem(getHitOptions(), event);
 		};
 		
 		tool.onMouseDrag = function(event) {

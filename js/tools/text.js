@@ -59,10 +59,15 @@ pg.tools.text = function () {
 		
 		var hitItem = null;
 				
+		var tolerance = 5;
 		var hitOptions = {
 			fill: true,
-			curves: true,
-			tolerance: 5 / paper.view.zoom
+			curves: true
+		};
+
+		var getHitOptions = function() {
+			hitOptions.tolerance = tolerance / paper.view.zoom;
+			return hitOptions;
 		};
 
 		// get options from local storage if present
@@ -79,7 +84,7 @@ pg.tools.text = function () {
 		}
 		
 		tool.onMouseMove = function(event) {
-			var hitResult = paper.project.hitTest(event.point, hitOptions);
+			var hitResult = paper.project.hitTest(event.point, getHitOptions());
 			if(hitResult && hitResult.item) {
 				var root = pg.item.getRootItem(hitResult.item);
 				if(root.data.isPGTextItem) {

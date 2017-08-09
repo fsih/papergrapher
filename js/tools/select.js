@@ -213,8 +213,11 @@ pg.tools.select = function() {
 			stroke: true,
 			curves: true,
 			fill: true,
-			guide: false,
-			tolerance: tolerance / paper.view.zoom
+			guide: false
+		};
+		var getHitOptions = function() {
+			hitOptions.tolerance = tolerance / paper.view.zoom;
+			return hitOptions;
 		};
 
 		var mode = 'none';
@@ -237,8 +240,7 @@ pg.tools.select = function() {
 			if(event.event.button > 0) return;  // only first mouse button
 			pg.hover.clearHoveredItem();
 			
-			hitOptions.tolerance = tolerance / paper.view.zoom;
-			var hitResults = paper.project.hitTestAll(event.point, hitOptions);
+			var hitResults = paper.project.hitTestAll(event.point, getHitOptions());
 			// Prefer rotate to trigger over scale, since their regions somewhat overlap
 			if (hitResults && hitResults.length > 0) {
 				var hitResult = hitResults[0];
@@ -346,7 +348,7 @@ pg.tools.select = function() {
 		};
 
 		tool.onMouseMove = function(event) {			
-			pg.hover.handleHoveredItem(hitOptions, event);
+			pg.hover.handleHoveredItem(getHitOptions(), event);
 		};
 
 		
