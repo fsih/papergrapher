@@ -622,20 +622,19 @@ pg.tools.select = function() {
 			}
 			
 			if(index == 7) {
-				var offset = new Point(0, 20/paper.view.zoom);
+				var offset = new Point(0, 20);
 				
 				var arrows = new paper.Path("M19.28,1.09C19.28.28,19,0,18.2,0c-1.67,0-3.34,0-5,0-.34,0-.88.24-1,.47a1.4,1.4,0,0,0,.36,1.08,15.27,15.27,0,0,0,1.46,1.36A6.4,6.4,0,0,1,6.52,4,5.85,5.85,0,0,1,5.24,3,15.27,15.27,0,0,0,6.7,1.61,1.4,1.4,0,0,0,7.06.54C7,.3,6.44.07,6.1.06c-1.67,0-3.34,0-5,0C.28,0,0,.31,0,1.12c0,1.67,0,3.34,0,5a1.23,1.23,0,0,0,.49,1,1.22,1.22,0,0,0,1-.31A14.38,14.38,0,0,0,2.84,5.26l.73.62a9.45,9.45,0,0,0,7.34,2,9.45,9.45,0,0,0,4.82-2.05l.73-.62a14.38,14.38,0,0,0,1.29,1.51,1.22,1.22,0,0,0,1,.31,1.23,1.23,0,0,0,.49-1C19.31,4.43,19.29,2.76,19.28,1.09Z");
 				arrows.translate(segment.point + offset + [-10.5, -5]);
 				
-				var line = new paper.Path();
-				line.add(segment.point + offset);
-				line.add(segment.point);
-				line.add(segment.point + [1,0]);
-				line.closed = true;
+				var line = new paper.Path.Rectangle(
+					segment.point + offset - [1,0],
+					segment.point + [1,0]);
 
 				var rotHandle = arrows.unite(line);
 				line.remove();
 				arrows.remove();
+				rotHandle.scale(1/paper.view.zoom, segment.point)
 				rotHandle.data = {
 					offset: offset,
 					isRotHandle: true,
@@ -643,8 +642,7 @@ pg.tools.select = function() {
 					noSelect: true,
 					noHover: true
 				};
-				rotHandle.strokeColor = pg.guides.getGuideColor('blue');
-				rotHandle.fillColor = 'white';
+				rotHandle.fillColor = pg.guides.getGuideColor('blue');
 				rotHandle.parent = pg.layer.getGuideLayer();
 				boundsRotHandles[index] = rotHandle;
 			}
