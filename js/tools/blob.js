@@ -175,20 +175,42 @@ pg.blob = function() {
 				    }
 				});
 			}
-			
 			for (var i = items.length - 1; i >= 0; i--) {
+				// TODO handle compound paths
+				if (items[i] instanceof Path && (!items[i].fillColor || items[i].fillColor._alpha === 0)) {
+					// Gather path segments
+					var subpaths = [];
+					var firstSeg = items[i];
+					var intersections = firstSeg.getIntersections(lastPath);
+					for (var j = intersections.length - 1; j >= 0; j--) {
+						var split = firstSeg.splitAt(intersections[j]);
+						if (split) {
+							subpaths.push(split);
+						}
+					}
+					subpaths.push(firstSeg);
+
+					// Remove the ones that are within the eraser stroke boundary
+					for (var k = subpaths.length - 1; k >= 0; k--) {
+						var segMidpoint = subpaths[k].getLocationAt(subpaths[k].length/2).point;
+						if (lastPath.contains(segMidpoint)) {
+							subpaths[k].remove();
+							subpaths.splice(k, 1);
+						}
+					}
+					lastPath.remove();
+					pg.undo.snapshot('eraser');
+					continue;
+				}
 				// Erase
 				newPath = items[i].subtract(lastPath);
 
 				// Gather path segments
 				var subpaths = [];
-				if (items[i] instanceof PathItem && !items[i].closed) {
+				if (items[i] instanceof Path && !items[i].closed) {
 					var firstSeg = items[i].clone();
 					var intersections = firstSeg.getIntersections(lastPath);
 					// keep first and last segments
-					if (intersections.length === 0) {
-						continue;
-					}
 					for (var j = intersections.length - 1; j >= 0; j--) {
 						subpaths.push(firstSeg.splitAt(intersections[j]));
 					}
