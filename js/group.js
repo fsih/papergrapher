@@ -4,10 +4,13 @@ pg.group = function() {
 
 	var groupSelection = function() {
 		var items = pg.selection.getSelectedItems();
-			if(items.length > 0) {
+		if(items.length > 0) {
 			var group = new paper.Group(items);
 			pg.selection.clearSelection();
 			pg.selection.setItemSelection(group, true);
+			for (var i = 0; i < group.children.length; i++) {
+				group.children[i].selected = true;
+			}
 			pg.undo.snapshot('groupSelection');
 			jQuery(document).trigger('Grouped');
 			return group;
