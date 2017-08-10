@@ -1,15 +1,16 @@
 // Applies segment brush functions to the tool
 pg.segmentbrushhelper = function(tool, options) {
-	var lastPoint, finalPath;
+	var lastPoint, finalPath, firstCircle;
 
 	tool.onSegmentMouseDown = function(event) {
 		tool.minDistance = 1;
 		tool.maxDistance = options.brushWidth;
 		
-		finalPath = new Path.Circle({
+		firstCircle = new Path.Circle({
 		    center: event.point,
 		    radius: options.brushWidth/2
 		});
+		finalPath = firstCircle;
 		tool.stylePath(finalPath);
 		lastPoint = event.point;
 	};
@@ -51,8 +52,14 @@ pg.segmentbrushhelper = function(tool, options) {
 		// TODO: This smoothing tends to cut off large portions of the path! Would like to eventually
 		// add back smoothing, maybe a custom implementation that only applies to a subset of the line?
 
-		// Smooth the path.
+		// Smooth the path. Make it unclosed first because smoothing of closed
+		// paths tends to cut off the path.
+		finalPath.closed = false;
 		finalPath.simplify(2);
+		finalPath.closed = true;
+		var temp = finalPath.unite(firstCircle);
+		finalPath.remove();
+		finalPath = temp;
 		//console.log(finalPath.segments);
 		return finalPath;
 	};
