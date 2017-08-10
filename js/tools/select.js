@@ -260,17 +260,17 @@ pg.tools.select = function() {
 			pg.hover.clearHoveredItem();
 			
 			var hitResults = paper.project.hitTestAll(event.point, getHitOptions());
-			// Prefer rotate to trigger over scale, since their regions somewhat overlap
+			// Prefer scale to trigger over rotate, since their regions overlap
 			if (hitResults && hitResults.length > 0) {
 				var hitResult = hitResults[0];
 				for (var i = 0; i < hitResults.length; i++) {
-					if (hitResults[i].item.data && hitResults[i].item.data.isRotHandle) {
-						hitResult = hitResults[i];
-						mode = 'rotate';
-						break;
-					} else if (hitResults[i].item.data && hitResults[i].item.data.isScaleHandle) {
+					 if (hitResults[i].item.data && hitResults[i].item.data.isScaleHandle) {
 						hitResult = hitResults[i];
 						mode = 'scale';
+						break;
+					} else if (hitResults[i].item.data && hitResults[i].item.data.isRotHandle) {
+						hitResult = hitResults[i];
+						mode = 'rotate';
 					}
 				}
 				if (mode === 'rotate') {

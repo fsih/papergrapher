@@ -29,9 +29,18 @@ pg.stylebar = function() {
 				['black', 'white']
 			],
 			beforeShow: function() {
+				pg.stylebar.oldFillColor = getFillColor();
 				showInputBlocker(true);
 			},
 			change: function(color) {
+				if(jQuery('.fillSpecContainer:visible')) {
+					var stringColor = color ? color.toRgbString() : "";
+					applyFillColorToSelection(stringColor);
+					showInputBlocker(false);
+				}
+				setColorsAreDefault(false);
+			},
+			move: function(color) {
 				if(jQuery('.fillSpecContainer:visible')) {
 					var stringColor = color ? color.toRgbString() : "";
 					applyFillColorToSelection(stringColor);
@@ -45,8 +54,9 @@ pg.stylebar = function() {
 			}
 		});
 		
-		jQuery('.fillSpecContainer .sp-choose').click(function() {
-			applyFillColorToSelection(getFillColor());
+		jQuery('.fillSpecContainer .sp-cancel').click(function() {
+			setFillColor(pg.stylebar.oldFillColor);
+			applyFillColorToSelection(pg.stylebar.oldFillColor);
 			showInputBlocker(false);
 		});
 		
@@ -69,8 +79,17 @@ pg.stylebar = function() {
 			],
 			beforeShow: function() {
 				showInputBlocker(true);
+				pg.stylebar.oldStrokeColor = getStrokeColor();
 			},
 			change: function(color) {
+				if(jQuery('.strokeSpecContainer:visible')) {
+					var stringColor = color ? color.toRgbString() : ""; 
+					applyStrokeColorToSelection(stringColor);
+					showInputBlocker(false);
+				}
+				setColorsAreDefault(false);
+			},
+			move: function(color) {
 				if(jQuery('.strokeSpecContainer:visible')) {
 					var stringColor = color ? color.toRgbString() : ""; 
 					applyStrokeColorToSelection(stringColor);
@@ -86,8 +105,9 @@ pg.stylebar = function() {
 
 		jQuery('.strokeColorSpec').append('<div class="inner"></div>');
 		
-		jQuery('.strokeSpecContainer .sp-choose').click(function() {
-			applyStrokeColorToSelection(getStrokeColor());
+		jQuery('.strokeSpecContainer .sp-cancel').click(function() {
+			setStrokeColor(pg.stylebar.oldStrokeColor);
+			applyStrokeColorToSelection(pg.stylebar.oldStrokeColor);
 			showInputBlocker(false);
 		});
 		
