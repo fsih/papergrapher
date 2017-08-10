@@ -282,14 +282,14 @@ pg.selection = function() {
 			item.fullySelected = false; 
 			// then the item can be normally selected
 			item.selected = state;
-			// deselect children of compound-path or group for cleaner item selection
+			// select children of compound-path or group
 			if(pg.compoundPath.isCompoundPath(item) || pg.group.isGroup(item)) {
 				
 				var children = item.children;
 				if(children) {
 					for(var i=0; i<children.length; i++) {
 						var child = children[i];
-						child.selected = !state;
+						child.selected = state;
 					}
 				}
 			}
