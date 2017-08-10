@@ -304,6 +304,7 @@ pg.tools.select = function() {
 							for (var i = 0; i < root.children.length; i++) {
 								root.children[i].selected = true;
 							}
+							jQuery(document).trigger('SelectionChanged');
 							if(event.modifiers.alt) {
 								mode = 'cloneMove';
 								pg.selection.cloneSelection();
