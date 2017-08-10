@@ -172,9 +172,11 @@ pg.tools.reshapecurve = function() {
 			// Choose hit result ===========================================================
 			// Prefer hits on already selected items
 			var hitResults = paper.project.hitTestAll(event.point, getHitOptions(true /* selected */));
+			//console.log('selected hit results '+hitResults.length);
 			if (hitResults.length === 0) {
 				hitResults = paper.project.hitTestAll(event.point, getHitOptions());
 			}
+			//console.log('hit results '+hitResults.length);
 			if (hitResults.length === 0) {
 				if (!event.modifiers.shift) {
 					pg.selection.clearSelection();
@@ -184,6 +186,7 @@ pg.tools.reshapecurve = function() {
 
 			var hitResult = hitResults[0];
 			for (var i = 0; i < hitResults.length; i++) {
+				//console.log('hit res type: '+ hitResults[i].type);
 				// Prefer hits on segments to other types of hits, to make sure handles are movable.
 				if (hitResults[i].type === 'segment') {
 					hitResult = hitResults[i];

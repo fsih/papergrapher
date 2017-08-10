@@ -5,7 +5,7 @@ pg.broadbrushhelper = function(tool, options) {
 	var lastPoint, secondLastPoint, finalPath;
 
 	tool.onBroadMouseDown = function(event) {
-		tool.minDistance = 1;
+		tool.minDistance = options.brushWidth/2;
 		tool.maxDistance = options.brushWidth;
 		if(event.event.button > 0) return;  // only first mouse button
 		
@@ -17,7 +17,6 @@ pg.broadbrushhelper = function(tool, options) {
 	
 	tool.onBroadMouseDrag = function(event) {
 		var step = (event.delta).normalize(options.brushWidth/2);
-
 		// Move the first point out away from the drag so that the end of the path is rounded
 		if (finalPath.segments && finalPath.segments.length === 1) {
 			var removedPoint = finalPath.removeSegment(0).point;
