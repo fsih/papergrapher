@@ -90,6 +90,29 @@ pg.tools.reshapecurve = function() {
 		paper.settings.handleSize = 8;
 				
 		var tolerance = 8;
+		var hitOptionsSelected = {
+			match: function(item) {
+				if (!item.item || !item.item.selected) { return; }
+				if (item.type === 'handle-out' || item.type === 'handle-in') {
+					// Only hit test against handles that are visible, that is,
+					// their segment is selected
+					if (!item.segment.selected) {
+						return false;
+					}
+					// If the entire shape is selected, handles are hidden
+					if (item.item.fullySelected) {
+						return false;
+					}
+				}
+				return true;
+			},
+			segments: true,
+			stroke: true,
+			curves: true,
+			handles: true,
+			fill: true,
+			guide: false,
+		};
 		var hitOptions = {
 			match: function(item) {
 				if (item.type === 'handle-out' || item.type === 'handle-in') {
@@ -112,9 +135,10 @@ pg.tools.reshapecurve = function() {
 			fill: true,
 			guide: false,
 		};
-		var getHitOptions = function() {
+		var getHitOptions = function(selected) {
+			hitOptionsSelected.tolerance =  tolerance / paper.view.zoom;
 			hitOptions.tolerance = tolerance / paper.view.zoom;
-			return hitOptions;
+			return selected ? hitOptionsSelected : hitOptions;
 		};
 
 		// TODO class needs to be refactored to get rid of all this flaky state
@@ -146,7 +170,11 @@ pg.tools.reshapecurve = function() {
 			pg.hover.clearHoveredItem();
 
 			// Choose hit result ===========================================================
-			var hitResults = paper.project.hitTestAll(event.point, getHitOptions());
+			// Prefer hits on already selected items
+			var hitResults = paper.project.hitTestAll(event.point, getHitOptions(true /* selected */));
+			if (hitResults.length === 0) {
+				hitResults = paper.project.hitTestAll(event.point, getHitOptions());
+			}
 			if (hitResults.length === 0) {
 				if (!event.modifiers.shift) {
 					pg.selection.clearSelection();
