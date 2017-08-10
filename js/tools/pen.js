@@ -72,8 +72,7 @@ pg.tools.pen = function() {
 		};
 		
 		// setup floating tool options panel in the editor
-		pg.toolOptionPanel.setup(options, components, function() {
-		});
+		//pg.toolOptionPanel.setup(options, components, function() {});
 		
 		tool.activate();
 	};

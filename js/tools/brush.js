@@ -25,6 +25,22 @@ pg.tools.broadbrush = function() {
 
 		// get options from local storage if present
 		options = pg.tools.getLocalOptions(options);
+		$('#brushWidth').removeClass('hidden');
+		$('#brushInput').val(options.brushWidth);
+		$('#brushInput').on('input', function (event) {
+			var eventValue = parseInt(event.currentTarget.value);
+			if (isNaN(eventValue)) eventValue = 0;
+			if (eventValue === options.brushWidth) {
+				return;
+			} else if (eventValue > parseInt(event.currentTarget.max)) {
+				eventValue = event.currentTarget.max;
+			} else if (eventValue < parseInt(event.currentTarget.min)) {
+				eventValue = event.currentTarget.min;
+			}
+			options.brushWidth = eventValue;
+			pg.tools.setLocalOptions(options);
+		});
+
 		var tool = new Tool();
 		blob.activateTool(false /* isEraser */, tool, options);
 
@@ -35,13 +51,15 @@ pg.tools.broadbrush = function() {
 		}
 
 		// setup floating tool options panel in the editor
-		pg.toolOptionPanel.setup(options, components, function() {});
+		//pg.toolOptionPanel.setup(options, components, function() {});
 		
 		tool.activate();
 	};
 
 	var deactivateTool = function() {
 		blob.deactivateTool();
+		$('#brushWidth').addClass('hidden');
+		$('#brushInput').unbind('input');
 	};
 	
 	return {

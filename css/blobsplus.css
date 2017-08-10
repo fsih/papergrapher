@@ -36,6 +36,10 @@ body {
 	padding-top: 30px;
 }
 
+.toolbarLabel {
+	font-size: 0.8em;
+}
+
 .appNav .topMenu>li.empty {
 	color: #eee;
 }
