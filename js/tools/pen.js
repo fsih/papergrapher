@@ -55,18 +55,17 @@ pg.tools.pen = function() {
 
 		tool.onMouseUp = function(event) {
 			if(event.event.button > 0) return;  // only first mouse button
-			//
+			
 			// accidental clicks produce a path but no segments
 			// so return if an accidental click happened
 			if(path.segments.length === 1) path.remove();
-			
+			path.simplify(options.smoothPath);
 			if (options.closePath === 'near start' 
-				&& pg.math.checkPointsClose(path.segments[0].point, event.point, 30)) {
+				&& (path.segments[0].point.getDistance(event.point) < 5/paper.view.zoom)) {
 				path.closePath(true);
 			} else if(options.closePath === 'always') {
 				path.closePath(true);
 			}
-			path.simplify(options.smoothPath);
 			pg.undo.snapshot('pen');
 			
 		};
