@@ -34,7 +34,7 @@ pg.stylebar = function() {
 			},
 			change: function(color) {
 				if(jQuery('.fillSpecContainer:visible')) {
-					var stringColor = color ? color.toRgbString() : "";
+					var stringColor = color ? color.toRgbString() : "rgba(0,0,0,0)";
 					applyFillColorToSelection(stringColor);
 					showInputBlocker(false);
 				}
@@ -42,7 +42,7 @@ pg.stylebar = function() {
 			},
 			move: function(color) {
 				if(jQuery('.fillSpecContainer:visible')) {
-					var stringColor = color ? color.toRgbString() : "";
+					var stringColor = color ? color.toRgbString() : "rgba(0,0,0,0)";
 					applyFillColorToSelection(stringColor);
 					showInputBlocker(false);
 				}
@@ -83,7 +83,7 @@ pg.stylebar = function() {
 			},
 			change: function(color) {
 				if(jQuery('.strokeSpecContainer:visible')) {
-					var stringColor = color ? color.toRgbString() : ""; 
+					var stringColor = color ? color.toRgbString() : "rgba(0,0,0,0)"; 
 					applyStrokeColorToSelection(stringColor);
 					showInputBlocker(false);
 				}
@@ -91,7 +91,7 @@ pg.stylebar = function() {
 			},
 			move: function(color) {
 				if(jQuery('.strokeSpecContainer:visible')) {
-					var stringColor = color ? color.toRgbString() : ""; 
+					var stringColor = color ? color.toRgbString() : "rgba(0,0,0,0)"; 
 					applyStrokeColorToSelection(stringColor);
 					showInputBlocker(false);
 				}
