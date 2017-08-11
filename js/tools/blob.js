@@ -185,6 +185,7 @@ pg.blob = function() {
 					for (var j = intersections.length - 1; j >= 0; j--) {
 						var split = firstSeg.splitAt(intersections[j]);
 						if (split) {
+							split.insertAbove(firstSeg);
 							subpaths.push(split);
 						}
 					}
@@ -204,6 +205,7 @@ pg.blob = function() {
 				}
 				// Erase
 				newPath = items[i].subtract(lastPath);
+				newPath.insertBelow(items[i]);
 
 				// Gather path segments
 				var subpaths = [];
@@ -212,7 +214,9 @@ pg.blob = function() {
 					var intersections = firstSeg.getIntersections(lastPath);
 					// keep first and last segments
 					for (var j = intersections.length - 1; j >= 0; j--) {
-						subpaths.push(firstSeg.splitAt(intersections[j]));
+						var split = firstSeg.splitAt(intersections[j]);
+						split.insertAbove(firstSeg);
+						subpaths.push(split);
 					}
 					subpaths.push(firstSeg);
 				}
