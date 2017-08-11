@@ -54,7 +54,7 @@ pg.segmentbrushhelper = function(tool, options) {
 
 		// Smooth the path. Make it unclosed first because smoothing of closed
 		// paths tends to cut off the path.
-		if (finalPath.segments.length > 4) {
+		if (finalPath.segments && finalPath.segments.length > 4) {
 			finalPath.closed = false;
 			finalPath.simplify(2);
 			finalPath.closed = true;
